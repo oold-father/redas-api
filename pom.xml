@@ -3,15 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.cdgeekcamp.redas.api.core</groupId>
-    <artifactId>redas_api_core</artifactId>
+    <groupId>com.cdgeekcamp.redas.api</groupId>
+    <artifactId>redas-api-core</artifactId>
     <version>1.0.0</version>
 
     <parent>
-        <groupId>com.cdgeekcamp.redas.pkg_mgt</groupId>
-        <artifactId>redas_pkg_mgt</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../redas_pkg_mgt</relativePath>
+	    <groupId>com.cdgeekcamp.redas</groupId>
+	    <artifactId>redas-pkg-mgt</artifactId>
+	    <version>1.0.0</version>
     </parent>
 
     <dependencies>
@@ -26,11 +25,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.cdgeekcamp.redas.lib</groupId>
-            <artifactId>core</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../redas_lib_core/target/com.cdgeekcamp.redas.lib.core-1.0.0.jar</systemPath>
+	        <groupId>com.cdgeekcamp.redas.lib</groupId>
+	        <artifactId>redas-lib-core</artifactId>
+	        <version>1.0.0</version>
         </dependency>
     </dependencies>
 
