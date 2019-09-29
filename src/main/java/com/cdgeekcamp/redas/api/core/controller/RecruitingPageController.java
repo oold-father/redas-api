@@ -1,7 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.RecruitingPage;
 import com.cdgeekcamp.redas.api.core.RecruitingPageApiMessage;
+import com.cdgeekcamp.redas.lib.core.RecruitingPage;
 import com.cdgeekcamp.redas.lib.core.RedasMqConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
