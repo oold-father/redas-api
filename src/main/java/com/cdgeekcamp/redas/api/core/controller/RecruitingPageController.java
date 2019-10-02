@@ -41,6 +41,6 @@ public class RecruitingPageController {
             System.out.println("消息发送成功:" + json_msg);
         }
 
-        return new RecruitingPageApiMessage(recruitingPage.getUuid(), "上报成功");
+        return new RecruitingPageApiMessage(recruitingPage.getSpiderUuid(), "上报成功");
     }
 }
