@@ -3,7 +3,8 @@ package com.cdgeekcamp.redas.api.core.controller;
 import com.cdgeekcamp.redas.lib.core.RecrPage;
 import com.cdgeekcamp.redas.lib.core.RecrPageJson;
 import com.cdgeekcamp.redas.lib.core.RedasMqConfig;
-import com.cdgeekcamp.redas.lib.core.api.*;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
+import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,17 +13,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Properties;
 
 @RestController
+@RequestMapping(value = "/recr_page")
 public class RecrPageController {
     @Autowired
     private RedasMqConfig redasMqConfig;
 
-    @PostMapping(value = "/add_recr_page", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponseBase addRecrPage(@RequestBody RecrPage RecrPage) {
+    @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ApiResponse addRecrPage(@RequestBody RecrPage RecrPage) {
         RecrPageJson RecrPageJson = new RecrPageJson();
         String json_msg = RecrPageJson.toJson(RecrPage);
         Properties p = new Properties();
@@ -36,6 +39,6 @@ public class RecrPageController {
             System.out.println("消息发送成功:" + json_msg);
         }
 
-        return new ApiResponseNoResult(ResponseCode.SUCCESS, "上报成功");
+        return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
     }
 }
