@@ -24,7 +24,6 @@ public class RecruitingPageController {
     private RedasMqConfig redasMqConfig;
 
     @PostMapping(value = "/add_recruiting_page", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody  // 对象转换为JSON返回
     public RecruitingPageApiMessage addRecruitingPage(@RequestBody RecruitingPage recruitingPage) throws JsonProcessingException {
         RecruitingPageJson recruitingPageJson = new RecruitingPageJson();
         String json_msg = recruitingPageJson.toJson(recruitingPage);
