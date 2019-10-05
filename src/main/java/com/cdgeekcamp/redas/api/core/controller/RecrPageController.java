@@ -1,9 +1,9 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.RecrPageApiMessage;
 import com.cdgeekcamp.redas.lib.core.RecrPage;
 import com.cdgeekcamp.redas.lib.core.RecrPageJson;
 import com.cdgeekcamp.redas.lib.core.RedasMqConfig;
+import com.cdgeekcamp.redas.lib.core.api.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -22,7 +22,7 @@ public class RecrPageController {
     private RedasMqConfig redasMqConfig;
 
     @PostMapping(value = "/add_recr_page", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public RecrPageApiMessage addRecrPage(@RequestBody RecrPage RecrPage) {
+    public ApiResponseBase addRecrPage(@RequestBody RecrPage RecrPage) {
         RecrPageJson RecrPageJson = new RecrPageJson();
         String json_msg = RecrPageJson.toJson(RecrPage);
         Properties p = new Properties();
@@ -36,6 +36,6 @@ public class RecrPageController {
             System.out.println("消息发送成功:" + json_msg);
         }
 
-        return new RecrPageApiMessage(RecrPage.getSpiderUuid(), "上报成功");
+        return new ApiResponseNoResult("0", "上报成功");
     }
 }
