@@ -1,13 +1,13 @@
 package com.cdgeekcamp.redas.api.core;
 
-public class RecruitingPageApiMessage {
+public class RecrPageApiMessage {
     private String uuid;
     private String message;
 
-    protected RecruitingPageApiMessage() {
+    protected RecrPageApiMessage() {
     }
 
-    public RecruitingPageApiMessage(String uuid, String message) {
+    public RecrPageApiMessage(String uuid, String message) {
         this.uuid = uuid;
         this.message = message;
     }
