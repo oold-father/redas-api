@@ -36,6 +36,6 @@ public class RecrPageController {
             System.out.println("消息发送成功:" + json_msg);
         }
 
-        return new ApiResponseNoResult("0", "上报成功");
+        return new ApiResponseNoResult(ResponseCode.SUCCESS, "上报成功");
     }
 }
