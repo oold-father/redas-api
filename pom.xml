@@ -8,9 +8,9 @@
     <version>1.0.0</version>
 
     <parent>
-	    <groupId>com.cdgeekcamp.redas</groupId>
-	    <artifactId>redas-pkg-mgt</artifactId>
-	    <version>1.0.0</version>
+        <groupId>com.cdgeekcamp.redas</groupId>
+        <artifactId>redas-pkg-mgt</artifactId>
+        <version>1.0.0</version>
     </parent>
 
     <dependencies>
@@ -19,15 +19,9 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.vaadin.external.google</groupId>
-            <artifactId>android-json</artifactId>
-            <version>0.0.20131108.vaadin1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-	        <groupId>com.cdgeekcamp.redas.lib</groupId>
-	        <artifactId>redas-lib-core</artifactId>
-	        <version>1.0.0</version>
+            <groupId>com.cdgeekcamp.redas.lib</groupId>
+            <artifactId>redas-lib-core</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

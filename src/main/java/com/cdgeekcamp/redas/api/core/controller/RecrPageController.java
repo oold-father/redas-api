@@ -4,7 +4,6 @@ import com.cdgeekcamp.redas.api.core.RecrPageApiMessage;
 import com.cdgeekcamp.redas.lib.core.RecrPage;
 import com.cdgeekcamp.redas.lib.core.RecrPageJson;
 import com.cdgeekcamp.redas.lib.core.RedasMqConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -23,7 +22,7 @@ public class RecrPageController {
     private RedasMqConfig redasMqConfig;
 
     @PostMapping(value = "/add_recr_page", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public RecrPageApiMessage addRecrPage(@RequestBody RecrPage RecrPage) throws JsonProcessingException {
+    public RecrPageApiMessage addRecrPage(@RequestBody RecrPage RecrPage) {
         RecrPageJson RecrPageJson = new RecrPageJson();
         String json_msg = RecrPageJson.toJson(RecrPage);
         Properties p = new Properties();
