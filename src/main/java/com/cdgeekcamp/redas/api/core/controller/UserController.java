@@ -4,6 +4,7 @@ import com.cdgeekcamp.redas.api.core.controller.json.UserJson;
 import com.cdgeekcamp.redas.db.model.User;
 import com.cdgeekcamp.redas.db.model.UserRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,11 +78,12 @@ public class UserController {
 
     @GetMapping(value = "list")
     public ApiResponse getUserList() {
-        ArrayList<User> userArrayList = new ArrayList<>();
+        ApiResponseList apiResponseList =
+                new ApiResponseList<>(ResponseCode.SUCCESS, "查询成功");
 
         for (User item : users.findAll())
-            userArrayList.add(item);
+            apiResponseList.addValue(item);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "查询成功", userArrayList);
+        return apiResponseList;
     }
 }
