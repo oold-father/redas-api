@@ -1,4 +1,4 @@
-curl -H "Content-Type: application/json" -X POST http://localhost:8080/add_recr_page -d '
+curl -H "Content-Type: application/json" -X POST http://localhost:8080/recr_page/add -d '
 {
 "srcName": "拉勾",
 "srcPosId": "1787334",
