@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -78,7 +77,7 @@ public class UserController {
 
     @GetMapping(value = "list")
     public ApiResponse getUserList() {
-        ApiResponseList apiResponseList =
+        ApiResponseList<User> apiResponseList =
                 new ApiResponseList<>(ResponseCode.SUCCESS, "查询成功");
 
         for (User item : users.findAll())
