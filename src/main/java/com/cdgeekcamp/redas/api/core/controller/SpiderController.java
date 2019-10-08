@@ -49,21 +49,20 @@ public class SpiderController {
     @PostMapping(value = "update", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse updateSpider(@RequestBody SpiderJson spiderJson) {
         Integer id = spiderJson.getId();
-        String uuid = spiderJson.getUuid();
         String desc = spiderJson.getDescribe();
         String location = spiderJson.getLocation();
         Boolean state = spiderJson.getState();
 
-        Optional<Spider> spiderById = spiders.findById(id);
+        Optional<Spider> spiderOpt = spiders.findById(id);
 
-        if (spiderById.isEmpty())
+        if (spiderOpt.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "修改spider失败，spider不存在");
 
-        spiderById.get().setUuid(uuid);
-        spiderById.get().setDescribe(desc);
-        spiderById.get().setLocation(location);
-        spiderById.get().setState(state);
-        spiders.save(spiderById.get());
+        Spider spider = spiderOpt.get();
+        spider.setDescribe(desc);
+        spider.setLocation(location);
+        spider.setState(state);
+        spiders.save(spider);
         return new ApiResponse(ResponseCode.SUCCESS, "修改spider成功");
     }
 
