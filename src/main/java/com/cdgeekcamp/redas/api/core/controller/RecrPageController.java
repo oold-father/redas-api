@@ -27,16 +27,16 @@ public class RecrPageController {
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addRecrPage(@RequestBody RecrPage RecrPage) {
         RecrPageJson RecrPageJson = new RecrPageJson();
-        String json_msg = RecrPageJson.toJson(RecrPage);
+        String jsonString = RecrPageJson.toJson(RecrPage);
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, redasMqConfig.getHost());
         p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p)) {
-            ProducerRecord<String, String> record = new ProducerRecord<>(redasMqConfig.getTopic(), json_msg);
+            ProducerRecord<String, String> record = new ProducerRecord<>(redasMqConfig.getTopic(), jsonString);
             kafkaProducer.send(record);
-            System.out.println("消息发送成功:" + json_msg);
+            System.out.println("消息发送成功:" + jsonString);
         }
 
         return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
