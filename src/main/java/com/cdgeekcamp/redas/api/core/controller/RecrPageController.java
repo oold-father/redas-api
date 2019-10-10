@@ -28,6 +28,7 @@ public class RecrPageController {
     public ApiResponse addRecrPage(@RequestBody RecrPage RecrPage) {
         RecrPageJson recrPageJson = new RecrPageJson();
         String jsonString = recrPageJson.toJson(RecrPage);
+
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, redasMqConfig.getHost());
         p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
