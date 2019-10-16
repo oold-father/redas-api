@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Service
-public class PositionDetailAndPositionsProductor {
+public class PositionsAndPosUrlAndDetailProductor {
 
     public ApiResponse productor(Map map, String host, String topic){
         Gson gson = new Gson();
