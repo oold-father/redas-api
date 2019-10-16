@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Properties;
 
 @Service
-public class PositionDetailAndListProductor {
+public class PositionDetailAndPositionsProductor {
 
     public ApiResponse productor(PosDetailAndPositionsHtml posDetailAndPositionsHtml, String host, String topic){
         PosDetailAndPositionsHtmlJson posDetailAndListJson = new PosDetailAndPositionsHtmlJson();

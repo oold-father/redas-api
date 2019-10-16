@@ -1,6 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.service.PositionDetailAndListProductor;
+import com.cdgeekcamp.redas.api.core.service.PositionDetailAndPositionsProductor;
 import com.cdgeekcamp.redas.lib.core.PosDetailAndPositionsHtml;
 import com.cdgeekcamp.redas.lib.core.PositionDetailHtmlMqConfig;
 import com.cdgeekcamp.redas.lib.core.PositionsUrlHtmlMqConfig;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/position")
 public class PositionUrlController {
     @Autowired
-    private PositionDetailAndListProductor positionDetailAndListProductor;
+    private PositionDetailAndPositionsProductor positionDetailAndPositionsProductor;
     @Autowired
     private PositionsUrlHtmlMqConfig positionsUrlHtmlMqConfig;
     @Autowired
@@ -25,14 +25,14 @@ public class PositionUrlController {
     @PostMapping(value = "/positions_url_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse positionList(@RequestBody PosDetailAndPositionsHtml posDetailAndPositionsHtml) {
 
-        return positionDetailAndListProductor.productor(posDetailAndPositionsHtml,
+        return positionDetailAndPositionsProductor.productor(posDetailAndPositionsHtml,
                 positionsUrlHtmlMqConfig.getHost(), positionsUrlHtmlMqConfig.getTopic());
     }
 
     @PostMapping(value = "/detail_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse positionDetail(@RequestBody PosDetailAndPositionsHtml posDetailAndPositionsHtml) {
 
-        return positionDetailAndListProductor.productor(posDetailAndPositionsHtml,
+        return positionDetailAndPositionsProductor.productor(posDetailAndPositionsHtml,
                 positionDetailHtmlMqConfig.getHost(), positionDetailHtmlMqConfig.getTopic());
     }
 
