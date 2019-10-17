@@ -2,6 +2,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.PositionsAndPosUrlAndDetailProductor;
 import com.cdgeekcamp.redas.lib.core.PositionDetailHtmlMqConfig;
+import com.cdgeekcamp.redas.lib.core.PositionUrlMqConfig;
 import com.cdgeekcamp.redas.lib.core.PositionsUrlHtmlMqConfig;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class PositionUrlController {
     private PositionsUrlHtmlMqConfig positionsUrlHtmlMqConfig;
     @Autowired
     private PositionDetailHtmlMqConfig positionDetailHtmlMqConfig;
+    @Autowired
+    private PositionUrlMqConfig positionUrlMqConfig;
 
     @PostMapping(value = "/positions_url_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse positionsUrlHtml(@RequestBody Map<String, String> map) {
@@ -34,7 +37,7 @@ public class PositionUrlController {
     public ApiResponse position_url(@RequestBody Map<String, String> map) {
 
         return positionsAndPosUrlAndDetailProductor.productor(map,
-                positionsUrlHtmlMqConfig.getHost(), positionsUrlHtmlMqConfig.getTopic());
+                positionUrlMqConfig.getHost(), positionUrlMqConfig.getTopic());
     }
 
     @PostMapping(value = "/detail_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
