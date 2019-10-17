@@ -1,9 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.PositionsAndPosUrlAndDetailProductor;
-import com.cdgeekcamp.redas.lib.core.PositionDetailHtmlMqConfig;
-import com.cdgeekcamp.redas.lib.core.PositionUrlMqConfig;
-import com.cdgeekcamp.redas.lib.core.PositionsUrlHtmlMqConfig;
+import com.cdgeekcamp.redas.lib.core.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,32 +17,23 @@ import java.util.Map;
 public class PositionUrlController {
     @Autowired
     private PositionsAndPosUrlAndDetailProductor positionsAndPosUrlAndDetailProductor;
-    @Autowired
-    private PositionsUrlHtmlMqConfig positionsUrlHtmlMqConfig;
-    @Autowired
-    private PositionDetailHtmlMqConfig positionDetailHtmlMqConfig;
-    @Autowired
-    private PositionUrlMqConfig positionUrlMqConfig;
 
     @PostMapping(value = "/positions_url_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse positionsUrlHtml(@RequestBody Map<String, String> map) {
+    public ApiResponse positionsUrlHtml(@RequestBody PositionsUrlHtml positionsUrlHtml) {
 
-        return positionsAndPosUrlAndDetailProductor.productor(map,
-                positionsUrlHtmlMqConfig.getHost(), positionsUrlHtmlMqConfig.getTopic());
+        return positionsAndPosUrlAndDetailProductor.PositionsUrlHtmlProductor(positionsUrlHtml);
     }
 
     @PostMapping(value = "/url", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse position_url(@RequestBody Map<String, String> map) {
+    public ApiResponse position_url(@RequestBody PositionUrl positionUrl) {
 
-        return positionsAndPosUrlAndDetailProductor.productor(map,
-                positionUrlMqConfig.getHost(), positionUrlMqConfig.getTopic());
+        return positionsAndPosUrlAndDetailProductor.PositionUrlProductor(positionUrl);
     }
 
     @PostMapping(value = "/detail_html", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse positionDetail(@RequestBody Map<String, String> map) {
+    public ApiResponse positionDetail(@RequestBody PositionDetailHtml positionDetailHtml) {
 
-        return positionsAndPosUrlAndDetailProductor.productor(map,
-                positionDetailHtmlMqConfig.getHost(), positionDetailHtmlMqConfig.getTopic());
+        return positionsAndPosUrlAndDetailProductor.PositionDetailHtmlProductor(positionDetailHtml);
     }
 
 }
