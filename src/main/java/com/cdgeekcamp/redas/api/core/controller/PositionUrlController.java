@@ -32,7 +32,6 @@ public class PositionUrlController {
 
     @PostMapping(value = "/url", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse position_url(@RequestBody Map<String, String> map) {
-
         return positionsAndPosUrlAndDetailProductor.productor(map,
                 positionsUrlHtmlMqConfig.getHost(), positionsUrlHtmlMqConfig.getTopic());
     }
