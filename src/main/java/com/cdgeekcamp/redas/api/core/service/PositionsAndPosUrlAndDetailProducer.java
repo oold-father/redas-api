@@ -21,9 +21,9 @@ public class PositionsAndPosUrlAndDetailProducer {
     @Autowired
     private PositionDetailHtmlMqConfig positionDetailHtmlMqConfig;
 
-    public ApiResponse PositionsUrlHtmlProducer(PositionsUrlHtml positionsUrlHtml){
-        PositionsUrlHtmlJson positionsUrlHtmlJson = new PositionsUrlHtmlJson();
-        String jsonString = positionsUrlHtmlJson.toJson(positionsUrlHtml);
+    public ApiResponse PositionsUrlHtmlProducer(DataToMq dataToMq){
+        DataToMqJson dataToMqJson = new DataToMqJson();
+        String jsonString = dataToMqJson.toJson(dataToMq);
 
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, positionsUrlHtmlMqConfig.getHost());
@@ -39,9 +39,7 @@ public class PositionsAndPosUrlAndDetailProducer {
         return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
     }
 
-    public ApiResponse PositionUrlProducer(PositionUrl positionUrl){
-        PositionUrlJson positionUrlJson = new PositionUrlJson();
-        String jsonString = positionUrlJson.toJson(positionUrl);
+    public ApiResponse PositionUrlProducer(String positionUrl){
 
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, positionUrlMqConfig.getHost());
@@ -49,17 +47,17 @@ public class PositionsAndPosUrlAndDetailProducer {
         p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p)) {
-            ProducerRecord<String, String> record = new ProducerRecord<>(positionUrlMqConfig.getTopic(), jsonString);
+            ProducerRecord<String, String> record = new ProducerRecord<>(positionUrlMqConfig.getTopic(), positionUrl);
             kafkaProducer.send(record);
-            System.out.println("消息发送成功:" + jsonString);
+            System.out.println("消息发送成功:" + positionUrl);
         }
 
         return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
     }
 
-    public ApiResponse PositionDetailHtmlProducer(PositionDetailHtml positionDetailHtml){
-        PositionDetailHtmlJson positionDetailHtmlJson = new PositionDetailHtmlJson();
-        String jsonString = positionDetailHtmlJson.toJson(positionDetailHtml);
+    public ApiResponse PositionDetailHtmlProducer(DataToMq dataToMq){
+        DataToMqJson dataToMqJson = new DataToMqJson();
+        String jsonString = dataToMqJson.toJson(dataToMq);
 
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, positionDetailHtmlMqConfig.getHost());
