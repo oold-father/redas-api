@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping(value = "/positions")
-public class PositionsController {
+public class PositionsUrlController {
     @Autowired
     private PositionsUrlRepository PositionsUrls;
 
