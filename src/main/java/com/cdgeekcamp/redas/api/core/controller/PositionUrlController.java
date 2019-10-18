@@ -35,7 +35,7 @@ public class PositionUrlController {
 
     @PostMapping(value = "/addUrl", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody UrlsToDB urlsToDB) {
-        System.out.println("enter----------------------------------------------------------------");
+
         // 判断职位列表非空
         if (urlsToDB.getUrls() == null) {
             return new ApiResponse(ResponseCode.FAILED, "添加Url失败，提交参数内容没有Url");
@@ -83,6 +83,5 @@ public class PositionUrlController {
         positionsUrl.save(newPositionsUrl);
         return responseList;
     }
-
 }
 
