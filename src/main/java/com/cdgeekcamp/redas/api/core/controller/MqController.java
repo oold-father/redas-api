@@ -6,6 +6,7 @@ import com.cdgeekcamp.redas.api.core.service.PositionUrlProducer;
 import com.cdgeekcamp.redas.api.core.service.PositionsUrlHtmlProducer;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.HtmlToMq;
+import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlToMq;
 import com.cdgeekcamp.redas.lib.core.jsonObject.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,13 @@ public class MqController {
     public ApiResponse mqAddPositionDetailHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
         String data = htmlJson.toJson(htmlToMq);
+        return positionUrlProducer.producerHandle(data);
+    }
+
+    @PostMapping(value = "/addRecrPage", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ApiResponse mqAddRecrPage(@RequestBody RecrPage recrPage) {
+        JsonObject<RecrPage> htmlJson = new JsonObject();
+        String data = htmlJson.toJson(recrPage);
         return positionUrlProducer.producerHandle(data);
     }
 }
