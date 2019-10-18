@@ -1,8 +1,8 @@
 package com.cdgeekcamp.redas.api.core.service;
 
-import com.cdgeekcamp.redas.lib.core.PositionUrlMqConfig;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
+import com.cdgeekcamp.redas.lib.core.mqConfig.PositionUrlMqConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
