@@ -2,15 +2,22 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
+import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlToMq;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlsToDB;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -28,8 +35,9 @@ public class PositionUrlController {
 
     @PostMapping(value = "/addUrl", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody UrlsToDB urlsToDB) {
+        System.out.println("enter----------------------------------------------------------------");
         // 判断职位列表非空
-        if (urlsToDB.equals(null)) {
+        if (urlsToDB.getUrls() == null) {
             return new ApiResponse(ResponseCode.FAILED, "添加Url失败，提交参数内容没有Url");
         }
 
@@ -40,7 +48,7 @@ public class PositionUrlController {
         }
 
         // 遍历职位列表
-        ArrayList<String> responseList = new ArrayList<>();
+        ApiResponseList<String> responseList = new ApiResponseList<>(ResponseCode.SUCCESS,"Url添加完成");
         for (String positionUrlSting : urlsToDB.getUrls()) {
             Optional<PositionUrl> positionUrl = positionUrls.findByUrl(positionUrlSting);
             if (positionUrl.isEmpty()) {
@@ -48,9 +56,24 @@ public class PositionUrlController {
                 PositionUrl result = positionUrls.save(new PositionUrl(positionUrlSting, RedasString.getNowTimeStamp(), false, null, RedasString.getPlatform(positionUrlSting)));
                 // 保存关系表
                 r_PositionsPositionUrl.save(new R_PositionsPositionUrl(result.getId(), positionsUrlResult.get().getId()));
-                responseList.add("添加url："+positionUrlSting + "成功");
+
+                // 发送到消息队列
+                String url = "http://127.0.0.1:8080/mq/addPositionUrl";
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+                Map<String, String> map= new LinkedHashMap<>();
+                map.put("url", positionUrlSting);
+
+                HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<ApiResponse> response = restTemplate.exchange(url, HttpMethod.POST,request, ApiResponse.class);
+
+                System.out.println(response.getBody());
+                responseList.addValue("添加url："+positionUrlSting + "成功");
             } else {
-                responseList.add("添加url："+positionUrlSting + "失败，Url已存在");
+                responseList.addValue("添加url："+positionUrlSting + "失败，Url已存在");
             }
         }
 
@@ -58,7 +81,8 @@ public class PositionUrlController {
         PositionsUrl newPositionsUrl = positionsUrlResult.get();
         newPositionsUrl.setState(true);
         positionsUrl.save(newPositionsUrl);
-        return new ApiResponseX<>(ResponseCode.SUCCESS,"Url添加完成", responseList);
+        return responseList;
     }
+
 }
 
