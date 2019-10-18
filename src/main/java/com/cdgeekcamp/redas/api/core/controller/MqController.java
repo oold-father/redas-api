@@ -23,7 +23,7 @@ public class MqController {
     private PositionDetailHtmlProducer positionDetailHtmlProducer;
 
     @PostMapping(value = "addUrl")
-    public ApiResponse mqAdd(@RequestBody MqJson mqJson) {
+    public ApiResponse mqAddUrl(@RequestBody MqJson mqJson) {
 
         return new ApiResponse(ResponseCode.FAILED, "添加Url失败，Url已存在");
     }
