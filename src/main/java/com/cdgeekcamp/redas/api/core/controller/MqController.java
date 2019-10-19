@@ -34,14 +34,14 @@ public class MqController {
     public ApiResponse mqAddPositionsUrlHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
         String data = htmlJson.toJson(htmlToMq);
-        return positionUrlProducer.producerHandle(data);
+        return positionsUrlHtmlProducer.producerHandle(data);
     }
 
     @PostMapping(value = "/addPositionDetailHtml", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddPositionDetailHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
         String data = htmlJson.toJson(htmlToMq);
-        return positionUrlProducer.producerHandle(data);
+        return positionDetailHtmlProducer.producerHandle(data);
     }
 
     @PostMapping(value = "/addRecrPage", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
