@@ -4,6 +4,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 import com.cdgeekcamp.redas.api.core.service.PositionDetailHtmlProducer;
 import com.cdgeekcamp.redas.api.core.service.PositionUrlProducer;
 import com.cdgeekcamp.redas.api.core.service.PositionsUrlHtmlProducer;
+import com.cdgeekcamp.redas.api.core.service.RecrPageProducer;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.HtmlToMq;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
@@ -24,6 +25,9 @@ public class MqController {
 
     @Autowired
     private PositionDetailHtmlProducer positionDetailHtmlProducer;
+
+    @Autowired
+    private RecrPageProducer recrPageProducer;
 
     @PostMapping(value = "addPositionUrl")
     public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq) {
@@ -48,6 +52,6 @@ public class MqController {
     public ApiResponse mqAddRecrPage(@RequestBody RecrPage recrPage) {
         JsonObject<RecrPage> htmlJson = new JsonObject();
         String data = htmlJson.toJson(recrPage);
-        return positionUrlProducer.producerHandle(data);
+        return recrPageProducer.producerHandle(data);
     }
 }
