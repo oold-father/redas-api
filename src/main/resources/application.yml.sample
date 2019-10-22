@@ -3,26 +3,36 @@ spring:
     url: jdbc:mysql://localhost:3306/redas?serverTimezone=Asia/Shanghai&useUnicode=yes&characterEncoding=UTF-8
     username: root
     password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: DatebookHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
   jpa:
     show-sql: true
 
 redas:
   mq:
-    host: 192.168.2.2:9092
+    host: 192.168.0.4:9092
     group: wjc
     topic: wjc
 
   mq_positions_url_html:
-    host: 192.168.2.2:9092
+    host: 192.168.0.4:9092
     group: positions_url_html
     topic: positions_url_html
 
   mq_position_url:
-    host: 192.168.2.2:9092
+    host: 192.168.0.4:9092
     group: position_url
     topic: position_url
 
   mq_position_detail_html:
-    host: 192.168.2.2:9092
+    host: 192.168.0.4:9092
     group: position_detail_html
     topic: position_detail_html
