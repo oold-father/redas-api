@@ -15,6 +15,9 @@ spring:
       connection-test-query: SELECT 1
   jpa:
     show-sql: true
+  jmx:
+    default-domain: com.cdgeekcamp.redas.api.core
+    unique-names: true
 
 redas:
   mq:
