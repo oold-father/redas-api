@@ -21,7 +21,7 @@ public class PositionsUrlController {
     private PositionsUrlRepository PositionsUrls;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse addPositionsUrl(PositionUrlJsonClass positionUrlJsonClass) {
+    public ApiResponse addPositionsUrl(@RequestBody PositionUrlJsonClass positionUrlJsonClass) {
         String url = positionUrlJsonClass.getUrl();
         Integer maxSize = positionUrlJsonClass.getMaxSize();
         Optional<PositionsUrl> result = PositionsUrls.findByUrl(url);
