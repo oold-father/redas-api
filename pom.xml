@@ -26,6 +26,12 @@
 <!--            </exclusions>-->
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <!-- provided表明该包只在编译和测试的时候用 -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.cdgeekcamp.redas.lib</groupId>
             <artifactId>redas-lib-core</artifactId>
             <version>1.0.0</version>

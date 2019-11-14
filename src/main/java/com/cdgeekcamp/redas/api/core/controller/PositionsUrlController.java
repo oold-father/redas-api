@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.controller.json.PositionUrlJsonClass;
 import com.cdgeekcamp.redas.db.model.PositionsUrl;
 import com.cdgeekcamp.redas.db.model.PositionsUrlRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
@@ -20,11 +21,13 @@ public class PositionsUrlController {
     private PositionsUrlRepository PositionsUrls;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse addPositionsUrl(@RequestParam("url") String url) {
+    public ApiResponse addPositionsUrl(@RequestBody PositionUrlJsonClass positionUrlJsonClass) {
+        String url = positionUrlJsonClass.getUrl();
+        Integer maxSize = positionUrlJsonClass.getMaxSize();
         Optional<PositionsUrl> result = PositionsUrls.findByUrl(url);
 
         if (result.isEmpty()){
-            PositionsUrls.save(new PositionsUrl(url, RedasString.getNowTimeStamp(), false, null, RedasString.getPlatform(url)));
+            PositionsUrls.save(new PositionsUrl(url, RedasString.getNowTimeStamp(), false, null, RedasString.getPlatform(url), maxSize));
             return new ApiResponse(ResponseCode.SUCCESS, "添加Url成功");
         }else {
             return new ApiResponse(ResponseCode.FAILED, "添加Url失败，Url已存在");
@@ -38,7 +41,8 @@ public class PositionsUrlController {
         if (0 == StreamSupport.stream(result.spliterator(), false).count()){
             return new ApiResponse(ResponseCode.FAILED, "获取Url失败,没有新的Url");
         }
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",result.iterator().next().getUrl());
+        PositionUrlJsonClass response = new PositionUrlJsonClass(result.iterator().next().getUrl(),result.iterator().next().getmaxSize());
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",response);
     }
 
 
