@@ -53,12 +53,12 @@ public class PositionUrlController {
             Optional<PositionUrl> positionUrl = positionUrls.findByUrl(positionUrlSting);
             if (positionUrl.isEmpty()) {
                 // 查询到非空则保存
-                PositionUrl result = positionUrls.save(new PositionUrl(positionUrlSting, RedasString.getNowTimeStamp(), false, null, RedasString.getPlatform(positionUrlSting)));
+                PositionUrl result = positionUrls.save(new PositionUrl(positionUrlSting, RedasString.getNowTimeStamp(), 0, null, RedasString.getPlatform(positionUrlSting)));
                 // 保存关系表
                 r_PositionsPositionUrl.save(new R_PositionsPositionUrl(result.getId(), positionsUrlResult.get().getId()));
 
                 responseList.addValue("添加url："+positionUrlSting + "成功");
-                if(result.isState() == false){
+                if(result.isState() == 0){
                     // 发送到消息队列
                     String url = "http://127.0.0.1:8080/mq/addPositionUrl";
                     HttpHeaders headers = new HttpHeaders();
@@ -81,7 +81,7 @@ public class PositionUrlController {
 
         // 来源Url状态更改
         PositionsUrl newPositionsUrl = positionsUrlResult.get();
-        newPositionsUrl.setState(true);
+        newPositionsUrl.setState(2);
         positionsUrl.save(newPositionsUrl);
         return responseList;
     }
