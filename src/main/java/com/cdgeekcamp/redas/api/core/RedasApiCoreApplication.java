@@ -16,10 +16,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "com.cdgeekcamp.redas.api.core"
 })
 public class RedasApiCoreApplication extends SpringBootServletInitializer {
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(RedasApiCoreApplication.class);
-    }
+    // SpringBootServletInitializer以及SpringApplicationBuilder相关代码用于兼容Tomcat运行本项目
+
     public static void main(String[] args) {
-        SpringApplication.run(RedasApiCoreApplication.class);
+        SpringApplication.run(RedasApiCoreApplication.class, args);
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(RedasApiCoreApplication.class);
     }
 }
