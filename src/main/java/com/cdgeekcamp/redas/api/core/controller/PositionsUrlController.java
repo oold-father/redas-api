@@ -27,7 +27,7 @@ public class PositionsUrlController {
         Optional<PositionsUrl> result = PositionsUrls.findByUrl(url);
 
         if (result.isEmpty()){
-            PositionsUrls.save(new PositionsUrl(url, RedasString.getNowTimeStamp(), false, null, RedasString.getPlatform(url), maxSize));
+            PositionsUrls.save(new PositionsUrl(url, RedasString.getNowTimeStamp(), 0, null, RedasString.getPlatform(url), maxSize));
             return new ApiResponse(ResponseCode.SUCCESS, "添加Url成功");
         }else {
             return new ApiResponse(ResponseCode.FAILED, "添加Url失败，Url已存在");
@@ -36,11 +36,17 @@ public class PositionsUrlController {
 
     @GetMapping(value = "get")
     public ApiResponse getPositionsUrl() {
-        Iterable<PositionsUrl> result = PositionsUrls.findByState(false);
+        Iterable<PositionsUrl> result = PositionsUrls.findByState(0);
 
         if (0 == StreamSupport.stream(result.spliterator(), false).count()){
             return new ApiResponse(ResponseCode.FAILED, "获取Url失败,没有新的Url");
         }
+
+        //        如果存在没有爬取的URL，获得第一个，并将其状态改为正在爬取
+        PositionsUrl resultUrl = result.iterator().next();
+        resultUrl.setState(1);
+        PositionsUrls.save(resultUrl);
+
         PositionUrlJsonClass response = new PositionUrlJsonClass(result.iterator().next().getUrl(),result.iterator().next().getmaxSize());
         return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",response);
     }
