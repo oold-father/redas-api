@@ -29,11 +29,6 @@ public class MqController {
     @Autowired
     private RecrPageProducer recrPageProducer;
 
-    @PostMapping(value = "addPositionUrl")
-    public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq) {
-        return positionUrlProducer.producerHandle(urlToMq.getUrl());
-    }
-
     @PostMapping(value = "/addPositionsUrlHtml", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddPositionsUrlHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
@@ -41,10 +36,16 @@ public class MqController {
         return positionsUrlHtmlProducer.producerHandle(data);
     }
 
+    @PostMapping(value = "addPositionUrl")
+    public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq) {
+        return positionUrlProducer.producerHandle(urlToMq.getUrl());
+    }
+
     @PostMapping(value = "/addPositionDetailHtml", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddPositionDetailHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
         String data = htmlJson.toJson(htmlToMq);
+        positionDetailHtmlProducer.urlStateHandle(htmlToMq);
         return positionDetailHtmlProducer.producerHandle(data);
     }
 
@@ -52,6 +53,7 @@ public class MqController {
     public ApiResponse mqAddRecrPage(@RequestBody RecrPage recrPage) {
         JsonObject<RecrPage> htmlJson = new JsonObject();
         String data = htmlJson.toJson(recrPage);
+        recrPageProducer.urlStateHandle(recrPage);
         return recrPageProducer.producerHandle(data);
     }
 }
