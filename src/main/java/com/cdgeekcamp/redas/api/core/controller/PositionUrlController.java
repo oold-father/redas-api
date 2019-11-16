@@ -15,10 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/position")
@@ -51,32 +48,40 @@ public class PositionUrlController {
         ApiResponseList<String> responseList = new ApiResponseList<>(ResponseCode.SUCCESS,"Url添加完成");
         for (String positionUrlSting : urlsToDB.getUrls()) {
             Optional<PositionUrl> positionUrl = positionUrls.findByUrl(positionUrlSting);
+            // 声明一个PositionUrl对象，根据不同的逻辑赋值
+            PositionUrl result;
             if (positionUrl.isEmpty()) {
                 // 查询到非空则保存
-                PositionUrl result = positionUrls.save(new PositionUrl(positionUrlSting, RedasString.getNowTimeStamp(), 0, null, RedasString.getPlatform(positionUrlSting)));
+                result = positionUrls.save(new PositionUrl(positionUrlSting, RedasString.getNowTimeStamp(), 0, null, RedasString.getPlatform(positionUrlSting)));
                 // 保存关系表
                 r_PositionsPositionUrl.save(new R_PositionsPositionUrl(result.getId(), positionsUrlResult.get().getId()));
 
                 responseList.addValue("添加url："+positionUrlSting + "成功");
-                if(result.isState() == 0){
-                    // 发送到消息队列
-                    String url = "http://127.0.0.1:8080/mq/addPositionUrl";
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-
-                    Map<String, String> map= new LinkedHashMap<>();
-                    map.put("url", positionUrlSting);
-
-                    HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
-
-                    RestTemplate restTemplate = new RestTemplate();
-                    ResponseEntity<ApiResponse> response = restTemplate.exchange(url, HttpMethod.POST,request, ApiResponse.class);
-                }
             } else {
+                result= positionUrl.get();
                 responseList.addValue("添加url："+positionUrlSting + "失败，Url已存在");
             }
 
+            // 状态为0的url发送到消息队列
+            if(result.isState() == 0){
+                // 发送到消息队列
+                String url = "http://127.0.0.1:8080/mq/addPositionUrl";
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
+                Map<String, String> map= new LinkedHashMap<>();
+                map.put("url", positionUrlSting);
+
+                HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<ApiResponse> response = restTemplate.exchange(url, HttpMethod.POST,request, ApiResponse.class);
+                // 添加成功，url状态改为1
+                if(Objects.requireNonNull(response.getBody()).getCode() == ResponseCode.SUCCESS){
+                    result.setState(1);
+                    positionUrls.save(result);
+                }
+            }
         }
 
         // 来源Url状态更改
