@@ -45,7 +45,6 @@ public class MqController {
     public ApiResponse mqAddPositionDetailHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject<HtmlToMq> htmlJson = new JsonObject();
         String data = htmlJson.toJson(htmlToMq);
-        positionDetailHtmlProducer.urlStateHandle(htmlToMq);
         return positionDetailHtmlProducer.producerHandle(data);
     }
 

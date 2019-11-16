@@ -1,10 +1,8 @@
 package com.cdgeekcamp.redas.api.core.service;
 
-import com.cdgeekcamp.redas.db.model.PositionUrl;
 import com.cdgeekcamp.redas.db.model.PositionUrlRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
-import com.cdgeekcamp.redas.lib.core.api.receivedParameter.HtmlToMq;
 import com.cdgeekcamp.redas.lib.core.mqConfig.PositionDetailHtmlMqConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -13,7 +11,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Properties;
 
 @Service
@@ -21,9 +18,6 @@ public class PositionDetailHtmlProducer implements ProducerBase{
 
     @Autowired
     private PositionDetailHtmlMqConfig positionDetailHtmlMqConfig;
-
-    @Autowired
-    private PositionUrlRepository positionUrlRepository;
 
     //    发送到消息队列
     @Override
@@ -43,14 +37,4 @@ public class PositionDetailHtmlProducer implements ProducerBase{
         return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
     }
 
-    //    修改状态
-    public void urlStateHandle(HtmlToMq htmlToMq){
-        try {
-            Optional<PositionUrl> positionUrlOptional = positionUrlRepository.findByUrl(htmlToMq.getUrl());
-            PositionUrl positionUrl = positionUrlOptional.get();
-            positionUrl.setState(1);
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
 }
