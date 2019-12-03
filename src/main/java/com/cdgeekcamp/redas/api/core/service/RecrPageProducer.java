@@ -48,6 +48,7 @@ public class RecrPageProducer implements ProducerBase {
             Optional<PositionUrl> positionUrlOptional = positionUrlRepository.findByUrl(recrPage.getSrcUrl());
             PositionUrl positionUrl = positionUrlOptional.get();
             positionUrl.setState(2);
+            positionUrlRepository.save(positionUrl);
         }catch (Exception e){
             System.out.println(e);
         }
