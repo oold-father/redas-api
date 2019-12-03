@@ -28,7 +28,6 @@ public class BackstageController {
     public ApiResponse addPositionsUrl(@RequestParam Integer isAdd) {
         if (isAdd == 0){
             Iterable<PositionUrl> result = positionUrls.findAllByState(0);
-            System.out.println(result.getClass());
             Integer num = 0;
             for (PositionUrl item: result){
 
