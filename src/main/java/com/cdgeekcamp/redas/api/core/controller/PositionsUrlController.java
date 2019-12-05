@@ -1,6 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.controller.json.PositionUrlJsonClass;
+import com.cdgeekcamp.redas.db.model.PositionUrl;
 import com.cdgeekcamp.redas.db.model.PositionsUrl;
 import com.cdgeekcamp.redas.db.model.PositionsUrlRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
@@ -8,9 +9,16 @@ import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -51,5 +59,25 @@ public class PositionsUrlController {
         return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",response);
     }
 
+    @GetMapping(value = "/getPostionsUrlList")
+    public ApiResponseX getPositionsUrlList(@PathParam("page") Integer page){
+        if(page == null || page <= 0){
+            page = 0;
+        }else {
+            page = page-1;
+        }
+        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+        Page<PositionsUrl> positionsUrls = PositionsUrls.findAll(pageable);
 
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("totalPage", positionsUrls.getTotalPages());
+
+        ArrayList<PositionsUrl> positionsUrlList = new ArrayList<>();
+        for (PositionsUrl positionsUrl : positionsUrls) {
+            positionsUrlList.add(positionsUrl);
+        }
+        map.put("positionsUrlList", positionsUrlList);
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+    }
 }
