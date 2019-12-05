@@ -1,20 +1,19 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.db.model.*;
-import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
-import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
-import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
-import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
-import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlToMq;
+import com.cdgeekcamp.redas.lib.core.api.*;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlsToDB;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.websocket.server.PathParam;
 import java.util.*;
 
 @RestController
@@ -89,6 +88,28 @@ public class PositionUrlController {
         newPositionsUrl.setState(2);
         positionsUrl.save(newPositionsUrl);
         return responseList;
+    }
+
+    @GetMapping(value = "/getUrlList")
+    public ApiResponseX getPositionUrlList(@PathParam("page") Integer page){
+        if(page == null || page <= 0){
+            page = 0;
+        }else {
+            page = page-1;
+        }
+        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+        Page<PositionUrl> posUrls = positionUrls.findAll(pageable);
+
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("totalPage", posUrls.getTotalPages());
+
+        ArrayList<PositionUrl> positionUrlList = new ArrayList<>();
+        for (PositionUrl posUrl : posUrls) {
+            positionUrlList.add(posUrl);
+        }
+        map.put("positionUrlList", positionUrlList);
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
     }
 }
 
