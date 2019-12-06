@@ -103,6 +103,8 @@ public class PositionUrlController {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         map.put("totalPage", posUrls.getTotalPages());
 
+        map.put("totalElements", posUrls.getTotalElements());
+
         ArrayList<PositionUrl> positionUrlList = new ArrayList<>();
         for (PositionUrl posUrl : posUrls) {
             positionUrlList.add(posUrl);
