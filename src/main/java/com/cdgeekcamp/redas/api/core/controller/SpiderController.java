@@ -1,16 +1,23 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.controller.json.SpiderJson;
+import com.cdgeekcamp.redas.db.model.PositionUrl;
 import com.cdgeekcamp.redas.db.model.Spider;
 import com.cdgeekcamp.redas.db.model.SpiderRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 @RestController
@@ -77,12 +84,27 @@ public class SpiderController {
     }
 
     @GetMapping(value = "list")
-    public ApiResponse getSpiderList() {
-        ArrayList<Spider> spiderArrayList = new ArrayList<>();
+    public ApiResponse getSpiderList(@PathParam("page") Integer page) {
+        if(page == null || page <= 0){
+            page = 0;
+        }else {
+            page = page-1;
+        }
+        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+        Page<Spider> spider = spiders.findAll(pageable);
 
-        for (Spider item : spiders.findAll())
-            spiderArrayList.add(item);
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("totalPage", spider.getTotalPages());
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "获取spider列表成功", spiderArrayList);
+        map.put("totalElements", spider.getTotalElements());
+
+        ArrayList<Spider> spiderlist = new ArrayList<>();
+        for (Spider item : spider) {
+            spiderlist.add(item);
+        }
+        map.put("spiderList", spiderlist);
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+
     }
 }
