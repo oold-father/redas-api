@@ -13,6 +13,27 @@
         <version>1.0.0</version>
     </parent>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>7.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>7.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>7.5.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -50,6 +71,11 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.5.0</version>
         </dependency>
     </dependencies>
 
