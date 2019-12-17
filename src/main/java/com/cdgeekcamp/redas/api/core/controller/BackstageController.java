@@ -1,19 +1,16 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.db.model.PositionUrl;
-import com.cdgeekcamp.redas.db.model.PositionUrlRepository;
-import com.cdgeekcamp.redas.db.model.PositionsUrlRepository;
+import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/backstage")
@@ -23,6 +20,9 @@ public class BackstageController {
 
     @Autowired
     PositionsUrlRepository positionsUrl;
+
+    @Autowired
+    NatureRepository nature;
 
     @GetMapping(value = "/positionUrl/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestParam Integer isAdd) {
@@ -54,5 +54,21 @@ public class BackstageController {
         }else {
             return new ApiResponse(ResponseCode.FAILED, "参数错误, 重要接口, 注意不要误操作");
         }
+    }
+
+    @GetMapping(value = "/natureList")
+    public ApiResponse getAddressInfo() {
+        Iterable<Nature> natureAll  = nature.findAll();
+
+        ArrayList<String> natures = new ArrayList<>();
+        for (Nature item: natureAll){
+            String value = item.getName();
+            if(!value.equals("不限")){
+                natures.add(item.getName());
+            }
+        }
+        ApiResponseList<String> result = new ApiResponseList<String>(ResponseCode.SUCCESS, "查询成功");
+        result.setResult(natures);
+        return result;
     }
 }
