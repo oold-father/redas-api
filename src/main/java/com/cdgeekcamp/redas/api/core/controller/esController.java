@@ -16,6 +16,7 @@ import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.*;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/es")
@@ -43,12 +45,20 @@ public class esController {
                                       @RequestParam(name = "edu", defaultValue = "不限") String edu,
                                       @RequestParam(name = "stage", defaultValue = "不限") String stage,
                                       @RequestParam(name = "scale", defaultValue = "不限") String scale,
-                                      @RequestParam(name = "nature", defaultValue = "不限") String nature
+                                      @RequestParam(name = "nature", defaultValue = "不限") String nature,
+                                      @RequestParam(name = "page", defaultValue= "0", required=false) Integer page,
+                                      @RequestParam(name = "maxEle", defaultValue= "20", required=false) Integer maxEle
                                       ) throws IOException {
 
         RestHighLevelClient client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
+
+        if(page <= 0){
+            page = 0;
+        }else {
+            page = page-1;
+        }
 
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("position", position);
@@ -73,6 +83,12 @@ public class esController {
         }
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(boolQueryBuilder);
+
+        searchSourceBuilder.from(page*maxEle);
+        searchSourceBuilder.size(maxEle);
+
+        searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+
         searchRequest.source(searchSourceBuilder);
         // 发送请求， 获取结果
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
