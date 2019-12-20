@@ -29,8 +29,9 @@ public class KeywordsController {
     private KeyWordsRepository keyWordsRepository;
 
     @GetMapping(value = "/get")
-    public ApiResponse getKeywordsInfo(@RequestParam(name = "page", defaultValue= "0", required=false) Integer page,
-                                       @RequestParam(name = "maxEle", defaultValue= "20", required=false) Integer maxEle) {
+    public ApiResponse getKeywordsInfo(
+            @RequestParam(name = "page", defaultValue= "0", required=false) Integer page,
+            @RequestParam(name = "maxEle", defaultValue= "20", required=false) Integer maxEle) {
 
         if(page <= 0){
             page = 0;
@@ -46,13 +47,13 @@ public class KeywordsController {
         for (KeyWords item: keyWords){
             Map<Object, Object> newNode = new HashMap<>();
             newNode.put("id", item.getId());
-            newNode.put("name", item.getName());
+            newNode.put("keyName", item.getKeyName());
             if (item.getParentId() == null){
                 newNode.put("parent", "");
                 newNode.put("parent_id", null);
             }else {
                 Optional<KeyWords> parent = keyWordsRepository.findById(item.getParentId());
-                newNode.put("parent", parent.get().getName());
+                newNode.put("parent", parent.get().getKeyName());
                 newNode.put("parent_id", parent.get().getId());
             }
             keyWords_list.add(newNode);
@@ -63,20 +64,49 @@ public class KeywordsController {
         responseMap.addKeyAndValue("data", keyWords_list);
         return responseMap;
     }
+    @GetMapping(value = "/getByParent")
+    public ApiResponse getKeywordsInfoByParent(
+            @RequestParam(name = "parent_id", defaultValue= "0", required=false) Integer parent_id){
+
+        if(parent_id <= 0){
+            parent_id = null;
+        }
+
+        Iterable<KeyWords> keyWords = keyWordsRepository.findByParentId(parent_id);
+        ArrayList<Object> keyWords_list = new ArrayList<>();
+        for (KeyWords item: keyWords){
+
+            Map<Object, Object> newNode = new HashMap<>();
+            newNode.put("id", item.getId());
+            newNode.put("keyName", item.getKeyName());
+
+            Iterable<KeyWords> childKey  = keyWordsRepository.findByParentId(item.getId());
+            newNode.put("leaf", 0 == StreamSupport.stream(childKey.spliterator(), false).count());
+
+            keyWords_list.add(newNode);
+        }
+        ApiResponseList<Object> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "查询成功");
+        responseList.setResult(keyWords_list);
+        return  responseList;
+    }
 
     @PostMapping(value = "/update")
     public ApiResponse updateKeywordsInfo(
             @RequestParam(name = "id") Integer id,
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "parent_id") Integer parent_id
+            @RequestParam(name = "keyName") String name,
+            @RequestParam(name = "parent_id", defaultValue= "0", required=false) Integer parent_id
             ) {
+
+        if (id == parent_id){
+            return new ApiResponse(ResponseCode.FAILED, "parent_id与id相同, 无法操作");
+        }
         Optional<KeyWords> keyWords  = keyWordsRepository.findById(id);
 
         if (keyWords.isEmpty()){
             return new ApiResponse(ResponseCode.FAILED, "更新失败, id不存在");
         }
         KeyWords keyWord = keyWords.get();
-        keyWord.setName(name);
+        keyWord.setKeyName(name);
 
         if (parent_id == 0){
             parent_id = null;
@@ -89,10 +119,13 @@ public class KeywordsController {
 
     @PostMapping(value = "/add")
     public ApiResponse addKeywordsInfo(
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "parent_id") Integer parent_id
+            @RequestParam(name = "keyName") String name,
+            @RequestParam(name = "parent_id", defaultValue= "0", required=false) Integer parent_id
     ) {
-        Optional<KeyWords> keyWords  = keyWordsRepository.findByNameAndParentId(name, parent_id);
+        if (parent_id <= 0){
+            parent_id = null;
+        }
+        Optional<KeyWords> keyWords  = keyWordsRepository.findByKeyNameAndParentId(name, parent_id);
 
         if (!keyWords.isEmpty()){
             return new ApiResponse(ResponseCode.FAILED, "添加失败失败, 已存在该keyword");
