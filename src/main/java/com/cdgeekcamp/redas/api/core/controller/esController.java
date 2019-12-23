@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.service.esService;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
@@ -11,25 +12,29 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.lucene.search.TotalHits;
-import org.elasticsearch.action.search.MultiSearchRequest;
-import org.elasticsearch.action.search.MultiSearchResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.*;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -37,6 +42,9 @@ import java.util.concurrent.TimeUnit;
 public class esController {
     @Autowired
     private EsApiCoreConfig esApiCoreConfig;
+
+    @Autowired
+    private esService esService;
 
     @GetMapping(value = "/positions")
     public ApiResponse esGetPositions(@RequestParam(name = "position", defaultValue = "不限") String position,
@@ -46,18 +54,16 @@ public class esController {
                                       @RequestParam(name = "stage", defaultValue = "不限") String stage,
                                       @RequestParam(name = "scale", defaultValue = "不限") String scale,
                                       @RequestParam(name = "nature", defaultValue = "不限") String nature,
-                                      @RequestParam(name = "page", defaultValue= "0", required=false) Integer page,
-                                      @RequestParam(name = "maxEle", defaultValue= "20", required=false) Integer maxEle
-                                      ) throws IOException {
+                                      @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
+                                      @RequestParam(name = "maxEle", defaultValue = "20", required = false) Integer maxEle
+    ) throws IOException {
 
-        RestHighLevelClient client = new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
+        RestHighLevelClient client = esService.getClient();
 
-        if(page <= 0){
+        if (page <= 0) {
             page = 0;
-        }else {
-            page = page-1;
+        } else {
+            page = page - 1;
         }
 
         Map<String, String> paramMap = new HashMap<>();
@@ -75,16 +81,16 @@ public class esController {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-        for (Map.Entry<String, String> param : paramMap.entrySet()){
-            if(!param.getValue().equals("不限")){
+        for (Map.Entry<String, String> param : paramMap.entrySet()) {
+            if (!param.getValue().equals("不限")) {
                 boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
-                                                   .operator(Operator.fromString("AND")));
+                        .operator(Operator.fromString("AND")));
             }
         }
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(boolQueryBuilder);
 
-        searchSourceBuilder.from(page*maxEle);
+        searchSourceBuilder.from(page * maxEle);
         searchSourceBuilder.size(maxEle);
 
         searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
@@ -116,5 +122,46 @@ public class esController {
 
         client.close();
         return result;
+    }
+
+    @GetMapping(value = "/statistics/eduAndTime")
+    public ApiResponse statisticsEduAndTime(
+            @RequestParam(name = "headDate") String headDate,
+            @RequestParam(name = "endDate") String endDate,
+            @RequestParam(name = "edu") String edu,
+            @RequestParam(name = "unit", defaultValue = "week") String unit
+    ) throws IOException {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate))
+                .must(QueryBuilders.matchQuery("edu", edu));
+
+//        System.out.println(boolQueryBuilder.toString());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(boolQueryBuilder)
+                .aggregation(AggregationBuilders
+                        .dateHistogram("count_position")
+                        .field("publishTime")
+                        .format("yyyy-MM-dd")
+                        .calendarInterval(new DateHistogramInterval(unit))
+                )
+                .size(0);
+
+        SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex())
+                .source(searchSourceBuilder);
+
+        Aggregations aggs = esService.getClient()
+                .search(searchRequest, RequestOptions.DEFAULT)
+                .getAggregations();
+
+        ParsedDateHistogram count_position = aggs.get("count_position");
+        ApiResponseList<Map> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "获取成功");
+        for (Histogram.Bucket groups: count_position.getBuckets()){
+            Map<Object, Object> group = new HashMap();
+            group.put("date", groups.getKeyAsString());
+            group.put("count", groups.getDocCount());
+            responseList.addValue(group);
+        }
+
+             return responseList;
     }
 }
