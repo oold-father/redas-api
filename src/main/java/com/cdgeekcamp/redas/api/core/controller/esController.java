@@ -5,16 +5,24 @@ import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
+import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
 import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
+import com.cdgeekcamp.redas.lib.core.jsonObject.JsonObject;
+import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.lucene.search.TotalHits;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.client.*;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -33,6 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -122,6 +133,38 @@ public class esController {
 
         client.close();
         return result;
+    }
+
+    @PostMapping(value = "/positions/addDoc")
+    public ApiResponse addPosition(
+            @RequestBody RecrPage recrPage
+            ) throws NoSuchAlgorithmException, IOException {
+        RestHighLevelClient client = esService.getClient();
+
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(recrPage.getSrcUrl().getBytes(StandardCharsets.UTF_8));
+        String id = RedasString.bytesToHex(hash);
+
+        String jsonString = new JsonObject<RecrPage>().toJson(recrPage);
+
+        IndexRequest request = new IndexRequest(esApiCoreConfig.getIndex())
+                .id(id)
+                .source(jsonString, XContentType.JSON);
+
+        IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
+        if (indexResponse.getResult() == DocWriteResponse.Result.CREATED) {
+            System.out.println(String.format("文档不存在, 创建新的文档, 文档id:%s", id));
+        } else if (indexResponse.getResult() == DocWriteResponse.Result.UPDATED) {
+            System.out.println(String.format("文档已存在, 更新文档, 文档id:%s", id));
+        }
+
+        ReplicationResponse.ShardInfo shardInfo = indexResponse.getShardInfo();
+        if (shardInfo.getFailed() > 0) {
+            return new ApiResponse(ResponseCode.FAILED, "发生未知错误");
+        }
+
+        return new ApiResponse(ResponseCode.SUCCESS, "添加成功");
     }
 
     @GetMapping(value = "/statistics/eduAndTime")
