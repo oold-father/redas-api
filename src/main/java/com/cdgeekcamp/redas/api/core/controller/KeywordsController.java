@@ -120,7 +120,8 @@ public class KeywordsController {
     @PostMapping(value = "/add")
     public ApiResponse addKeywordsInfo(
             @RequestParam(name = "keyName") String name,
-            @RequestParam(name = "parent_id", defaultValue= "0", required=false) Integer parent_id
+            @RequestParam(name = "parent_id", defaultValue= "0", required=false) Integer parent_id,
+            @RequestParam(name = "level", defaultValue= "1", required=false) Integer level
     ) {
         if (parent_id <= 0){
             parent_id = null;
@@ -131,7 +132,7 @@ public class KeywordsController {
             return new ApiResponse(ResponseCode.FAILED, "添加失败失败, 已存在该keyword");
         }
 
-        KeyWords keyWord = new KeyWords(parent_id, name);
+        KeyWords keyWord = new KeyWords(parent_id, name, level);
         keyWordsRepository.save(keyWord);
         return new ApiResponse(ResponseCode.SUCCESS, "更新成功");
     }
