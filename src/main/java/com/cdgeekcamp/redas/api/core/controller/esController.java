@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.api.core.service.esService;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
@@ -8,6 +9,7 @@ import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
 import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
 import com.cdgeekcamp.redas.lib.core.jsonObject.JsonObject;
+import com.cdgeekcamp.redas.lib.core.util.EduLevelMap;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHost;
@@ -36,6 +38,10 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedLongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +50,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -71,12 +81,7 @@ public class esController {
 
         RestHighLevelClient client = esService.getClient();
 
-        if (page <= 0) {
-            page = 0;
-        } else {
-            page = page - 1;
-        }
-
+        Integer pageNum = new Pagination().Page(page);
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("position", position);
         paramMap.put("location", address);
@@ -101,7 +106,7 @@ public class esController {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(boolQueryBuilder);
 
-        searchSourceBuilder.from(page * maxEle);
+        searchSourceBuilder.from(pageNum * maxEle);
         searchSourceBuilder.size(maxEle);
 
         searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
@@ -138,7 +143,7 @@ public class esController {
     @PostMapping(value = "/positions/addDoc")
     public ApiResponse addPosition(
             @RequestBody RecrPage recrPage
-            ) throws NoSuchAlgorithmException, IOException {
+    ) throws NoSuchAlgorithmException, IOException {
         RestHighLevelClient client = esService.getClient();
 
 
@@ -171,21 +176,30 @@ public class esController {
     public ApiResponse statisticsEduAndTime(
             @RequestParam(name = "headDate") String headDate,
             @RequestParam(name = "endDate") String endDate,
-            @RequestParam(name = "edu") String edu,
-            @RequestParam(name = "unit", defaultValue = "week") String unit
-    ) throws IOException {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate))
-                .must(QueryBuilders.matchQuery("edu", edu));
+            @RequestParam(name = "city") String city,
+            @RequestParam(name = "position") String position
+    ) throws IOException, ParseException {
 
-//        System.out.println(boolQueryBuilder.toString());
+        Map<String, String> paramMap = new HashMap<>();
+        paramMap.put("position", position);
+        paramMap.put("city", city);
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate));
+
+        for (Map.Entry<String, String> param : paramMap.entrySet()) {
+            if (!param.getValue().equals("不限")) {
+                boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
+                        .operator(Operator.fromString("AND")));
+            }
+        }
+
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQueryBuilder)
                 .aggregation(AggregationBuilders
-                        .dateHistogram("count_position")
-                        .field("publishTime")
-                        .format("yyyy-MM-dd")
-                        .calendarInterval(new DateHistogramInterval(unit))
+                        .terms("count_position")
+                        .field("eduLevel")
+
                 )
                 .size(0);
 
@@ -196,15 +210,86 @@ public class esController {
                 .search(searchRequest, RequestOptions.DEFAULT)
                 .getAggregations();
 
-        ParsedDateHistogram count_position = aggs.get("count_position");
+        ParsedLongTerms count_position = aggs.get("count_position");
         ApiResponseList<Map> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "获取成功");
-        for (Histogram.Bucket groups: count_position.getBuckets()){
-            Map<Object, Object> group = new HashMap();
-            group.put("date", groups.getKeyAsString());
-            group.put("count", groups.getDocCount());
-            responseList.addValue(group);
+        for (Terms.Bucket groups : count_position.getBuckets()) {
+            Number key = groups.getKeyAsNumber();
+            Number value = groups.getDocCount();
+
+            String keyAsString = EduLevelMap.getLevel(key.intValue());
+
+            Map<Object, Object> resultMap = new HashMap<>();
+            resultMap.put("name", keyAsString);
+            resultMap.put("y", value.intValue());
+
+            responseList.addValue(resultMap);
+        }
+        return responseList;
+    }
+
+    @GetMapping(value = "/statistics/ExpAndTime")
+    public ApiResponse statisticsExpAndTime(@RequestParam(name = "headDate") String headDate,
+                                            @RequestParam(name = "endDate") String endDate,
+                                            @RequestParam(name = "city") String city,
+                                            @RequestParam(name = "position") String position
+    ) throws IOException, ParseException {
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate));
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("position", position);
+        paramMap.put("city", city);
+
+        for (Map.Entry<String, Object> param : paramMap.entrySet()) {
+            if (!param.getValue().equals("不限")) {
+                boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
+                        .operator(Operator.fromString("AND")));
+            }
         }
 
-             return responseList;
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(boolQueryBuilder)
+                .aggregation(AggregationBuilders
+                        .terms("count_position")
+                        .field("expMin")
+                )
+                .size(0);
+
+        SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex())
+                .source(searchSourceBuilder);
+
+        Aggregations aggs = esService.getClient()
+                .search(searchRequest, RequestOptions.DEFAULT)
+                .getAggregations();
+
+        ParsedLongTerms count_position = aggs.get("count_position");
+        ApiResponseList<Map> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "获取成功");
+
+        Map<Object, Object> moreThan5Map = new HashMap<>();
+        moreThan5Map.put("name", "5年");
+        moreThan5Map.put("y", 0);
+
+        for (Terms.Bucket groups : count_position.getBuckets()) {
+            Number key = groups.getKeyAsNumber();
+            Number value = groups.getDocCount();
+
+            Map<Object, Object> resultMap = new HashMap<>();
+            if (key.intValue() == 0){
+                resultMap.put("name", "应届");
+                resultMap.put("y", value.intValue());
+            }else if (key.intValue() >=5){
+                moreThan5Map.put("y", (int)moreThan5Map.get("y") + value.intValue());
+                continue;
+            }else {
+                resultMap.put("name", String.format("%s年", key.toString()));
+                resultMap.put("y", value.intValue());
+            }
+
+            responseList.addValue(resultMap);
+        }
+
+        responseList.addValue(moreThan5Map);
+
+        return responseList;
     }
 }
