@@ -66,6 +66,8 @@ public class WebChartController {
             position.clear();
             position.addAll(set);
 
+            edu.add("初中");
+            edu.add("高中");
             edu.add("中专");
             edu.add("大专");
             edu.add("本科");
@@ -96,7 +98,7 @@ public class WebChartController {
 
     // 净增长
     @GetMapping(value = "/jobTimeNetIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeNetIncrement(@RequestParam("position") String position,
+    public ApiResponseList<Map<String, Object>> jobTimeNetIncrement(@RequestAttribute(name = "position") String[] position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -107,15 +109,15 @@ public class WebChartController {
             RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
                             new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
 
-            Map<String, String> paramMap = new HashMap<>();
-            paramMap.put("position", position);
-            paramMap.put("city", city);
-
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             boolQueryBuilder.must().add(QueryBuilders.rangeQuery("publishTime").gte(startDate).lte(endDate));
-            for (Map.Entry<String, String> param : paramMap.entrySet()){
-                boolQueryBuilder.must().add(QueryBuilders.matchQuery(param.getKey(), param.getValue()));
+            boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
+
+            BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
+            for (String item : position){
+                boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
+            boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
 
             // 创建builder
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -159,7 +161,7 @@ public class WebChartController {
 
     // 环比增长
     @GetMapping(value = "/jobTimeMoMIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeMoMIncrement(@RequestParam("position") String position,
+    public ApiResponseList<Map<String, Object>> jobTimeMoMIncrement(@RequestAttribute("position") String[] position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -170,15 +172,15 @@ public class WebChartController {
             RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
                     new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
 
-            Map<String, String> paramMap = new HashMap<>();
-            paramMap.put("position", position);
-            paramMap.put("city", city);
-
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             boolQueryBuilder.must().add(QueryBuilders.rangeQuery("publishTime").gte(startDate).lte(endDate));
-            for (Map.Entry<String, String> param : paramMap.entrySet()){
-                boolQueryBuilder.must().add(QueryBuilders.matchQuery(param.getKey(), param.getValue()));
+            boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
+
+            BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
+            for (String item : position){
+                boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
+            boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
 
             // 创建builder
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -234,7 +236,7 @@ public class WebChartController {
     }
 
     @GetMapping(value = "/positionSalaryChart")
-    public ApiResponseList<Map<String, Object>> positionSalaryChart(@RequestParam("position") String position,
+    public ApiResponseList<Map<String, Object>> positionSalaryChart(@RequestAttribute("position") String[] position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -245,16 +247,16 @@ public class WebChartController {
             RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
                     new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
 
-            Map<String, String> paramMap = new HashMap<>();
-            paramMap.put("position", position);
-            paramMap.put("city", city);
-
             // 查询bool
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             boolQueryBuilder.must().add(QueryBuilders.rangeQuery("publishTime").gte(startDate).lte(endDate));
-            for (Map.Entry<String, String> param : paramMap.entrySet()){
-                boolQueryBuilder.must().add(QueryBuilders.matchQuery(param.getKey(), param.getValue()));
+            boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
+
+            BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
+            for (String item : position){
+                boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
+            boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
 
             // 去掉salaryMax,salaryMin都为0的数据
             BoolQueryBuilder boolQueryBuildermust = QueryBuilders.boolQuery();
