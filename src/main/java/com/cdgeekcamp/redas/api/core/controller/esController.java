@@ -177,22 +177,23 @@ public class esController {
             @RequestParam(name = "headDate") String headDate,
             @RequestParam(name = "endDate") String endDate,
             @RequestParam(name = "city") String city,
-            @RequestParam(name = "position") String position
+            @RequestAttribute(name = "position") String[] position
     ) throws IOException, ParseException {
 
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("position", position);
-        paramMap.put("city", city);
-
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate));
+                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate))
+                .must(QueryBuilders.matchQuery("city", city).operator(Operator.fromString("AND")));
 
-        for (Map.Entry<String, String> param : paramMap.entrySet()) {
-            if (!param.getValue().equals("不限")) {
-                boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
+        BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
+
+        for (String item : position) {
+            if (!item.equals("不限")) {
+                positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));
             }
         }
+
+        boolQueryBuilder.must(positionBoolQueryBuilder);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQueryBuilder)
@@ -231,21 +232,23 @@ public class esController {
     public ApiResponse statisticsExpAndTime(@RequestParam(name = "headDate") String headDate,
                                             @RequestParam(name = "endDate") String endDate,
                                             @RequestParam(name = "city") String city,
-                                            @RequestParam(name = "position") String position
+                                            @RequestAttribute(name = "position") String[] position
     ) throws IOException, ParseException {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate));
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("position", position);
-        paramMap.put("city", city);
+                .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate))
+                .must(QueryBuilders.matchQuery("city", city).operator(Operator.fromString("AND")));
 
-        for (Map.Entry<String, Object> param : paramMap.entrySet()) {
-            if (!param.getValue().equals("不限")) {
-                boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
+        BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
+
+        for (String item : position) {
+            if (!item.equals("不限")) {
+                positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));
             }
         }
+
+        boolQueryBuilder.must(positionBoolQueryBuilder);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQueryBuilder)
