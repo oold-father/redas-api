@@ -6,13 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class EsInterceptor implements HandlerInterceptor {
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
         String position = request.getParameter("position");
         if (position == null){
-            System.out.println("no position");
+            System.out.println("It's HandlerInterceptor");
         }else {
             String[] parts = position.split("/");
             request.setAttribute("position", parts);
