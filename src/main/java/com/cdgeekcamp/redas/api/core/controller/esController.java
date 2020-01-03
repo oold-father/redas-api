@@ -68,7 +68,9 @@ public class esController {
     private esService esService;
 
     @GetMapping(value = "/positions")
-    public ApiResponse esGetPositions(@RequestParam(name = "position", defaultValue = "不限") String position,
+    public ApiResponse esGetPositions(
+//            @RequestParam(name = "position", defaultValue = "不限") String position,
+                                      @RequestAttribute(name = "position") String[] position,
                                       @RequestParam(name = "address", defaultValue = "不限") String address,
                                       @RequestParam(name = "exp", defaultValue = "不限") String exp,
                                       @RequestParam(name = "edu", defaultValue = "不限") String edu,
@@ -83,7 +85,7 @@ public class esController {
 
         Integer pageNum = new Pagination().Page(page);
         Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("position", position);
+//        paramMap.put("position", position);
         paramMap.put("location", address);
 //        paramMap.put("address", address);
         paramMap.put("exp", exp);
@@ -103,13 +105,21 @@ public class esController {
                         .operator(Operator.fromString("AND")));
             }
         }
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(boolQueryBuilder);
+        BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
 
-        searchSourceBuilder.from(pageNum * maxEle);
-        searchSourceBuilder.size(maxEle);
+        for (String item : position) {
+            if (!item.equals("不限")) {
+                positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
+                        .operator(Operator.fromString("AND")));
+            }
+        }
+        boolQueryBuilder.must(positionBoolQueryBuilder);
 
-        searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(boolQueryBuilder)
+                .from(pageNum * maxEle)
+                .size(maxEle)
+                .timeout(new TimeValue(60, TimeUnit.SECONDS));
 
         searchRequest.source(searchSourceBuilder);
         // 发送请求， 获取结果
@@ -177,6 +187,7 @@ public class esController {
             @RequestParam(name = "headDate") String headDate,
             @RequestParam(name = "endDate") String endDate,
             @RequestParam(name = "city") String city,
+            @RequestParam(name = "edu") String edu,
             @RequestAttribute(name = "position") String[] position
     ) throws IOException, ParseException {
 
@@ -223,6 +234,10 @@ public class esController {
             resultMap.put("name", keyAsString);
             resultMap.put("y", value.intValue());
 
+            if (edu.equals(keyAsString)){
+                resultMap.put("sliced", true);
+            }
+
             responseList.addValue(resultMap);
         }
         return responseList;
@@ -232,6 +247,7 @@ public class esController {
     public ApiResponse statisticsExpAndTime(@RequestParam(name = "headDate") String headDate,
                                             @RequestParam(name = "endDate") String endDate,
                                             @RequestParam(name = "city") String city,
+                                            @RequestParam(name = "exp") String exp,
                                             @RequestAttribute(name = "position") String[] position
     ) throws IOException, ParseException {
 
@@ -286,6 +302,10 @@ public class esController {
             }else {
                 resultMap.put("name", String.format("%s年", key.toString()));
                 resultMap.put("y", value.intValue());
+            }
+
+            if (exp.equals(resultMap.get("name"))){
+                resultMap.put("sliced", true);
             }
 
             responseList.addValue(resultMap);
