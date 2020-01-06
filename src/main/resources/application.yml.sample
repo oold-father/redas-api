@@ -21,21 +21,27 @@ spring:
 
 redas:
   mq:
-    host: 192.168.0.4:9092
-    group: wjc
-    topic: wjc
-
+    host: 127.0.0.1:9092
+    group: recrpage
+    topic: recrpage
   mq_positions_url_html:
-    host: 192.168.0.4:9092
+    host: 127.0.0.1:9092
     group: positions_url_html
     topic: positions_url_html
 
   mq_position_url:
-    host: 192.168.0.4:9092
+    host: 127.0.0.1:9092
     group: position_url
     topic: position_url
 
   mq_position_detail_html:
-    host: 192.168.0.4:9092
+    host: 127.0.0.1:9092
     group: position_detail_html
     topic: position_detail_html
+  elasticsearch:
+    api_core:
+      scheme: http
+      host: 192.168.0.6
+      port: 9200
+      index: redas
+      type: position
