@@ -69,8 +69,7 @@ public class esController {
 
     @GetMapping(value = "/positions")
     public ApiResponse esGetPositions(
-//            @RequestParam(name = "position", defaultValue = "不限") String position,
-                                      @RequestAttribute(name = "position") String[] position,
+                                      @RequestAttribute(name = "position") String position,
                                       @RequestParam(name = "address", defaultValue = "不限") String address,
                                       @RequestParam(name = "exp", defaultValue = "不限") String exp,
                                       @RequestParam(name = "edu", defaultValue = "不限") String edu,
@@ -85,9 +84,7 @@ public class esController {
 
         Integer pageNum = new Pagination().Page(page);
         Map<String, String> paramMap = new HashMap<>();
-//        paramMap.put("position", position);
-        paramMap.put("location", address);
-//        paramMap.put("address", address);
+        paramMap.put("address", address);
         paramMap.put("exp", exp);
         paramMap.put("edu", edu);
         paramMap.put("stage", stage);
@@ -107,7 +104,7 @@ public class esController {
         }
         BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
 
-        for (String item : position) {
+        for (String item : position.split(",")) {
             if (!item.equals("不限")) {
                 positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));
@@ -188,7 +185,7 @@ public class esController {
             @RequestParam(name = "endDate") String endDate,
             @RequestParam(name = "city") String city,
             @RequestParam(name = "edu") String edu,
-            @RequestAttribute(name = "position") String[] position
+            @RequestAttribute(name = "position") String position
     ) throws IOException, ParseException {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
@@ -197,7 +194,7 @@ public class esController {
 
         BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
 
-        for (String item : position) {
+        for (String item : position.split(",")) {
             if (!item.equals("不限")) {
                 positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));
@@ -248,7 +245,7 @@ public class esController {
                                             @RequestParam(name = "endDate") String endDate,
                                             @RequestParam(name = "city") String city,
                                             @RequestParam(name = "exp") String exp,
-                                            @RequestAttribute(name = "position") String[] position
+                                            @RequestAttribute(name = "position") String position
     ) throws IOException, ParseException {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
@@ -257,7 +254,7 @@ public class esController {
 
         BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
 
-        for (String item : position) {
+        for (String item : position.split(",")) {
             if (!item.equals("不限")) {
                 positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));

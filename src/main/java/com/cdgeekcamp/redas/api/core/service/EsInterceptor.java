@@ -13,10 +13,9 @@ public class EsInterceptor implements HandlerInterceptor {
 
         String position = request.getParameter("position");
         if (position == null){
-            System.out.println("It's HandlerInterceptor");
+            request.setAttribute("position", "不限");
         }else {
-            String[] parts = position.split("/");
-            request.setAttribute("position", parts);
+            request.setAttribute("position", position.replace("/", ","));
         }
 
         return true;// 只有返回true才会继续向下执行，返回false取消当前请求
