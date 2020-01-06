@@ -98,7 +98,7 @@ public class WebChartController {
 
     // 净增长
     @GetMapping(value = "/jobTimeNetIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeNetIncrement(@RequestAttribute(name = "position") String[] position,
+    public ApiResponseList<Map<String, Object>> jobTimeNetIncrement(@RequestAttribute(name = "position") String position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -114,7 +114,7 @@ public class WebChartController {
             boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
 
             BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
-            for (String item : position){
+            for (String item : position.split(",")){
                 boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
             boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
@@ -161,7 +161,7 @@ public class WebChartController {
 
     // 环比增长
     @GetMapping(value = "/jobTimeMoMIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeMoMIncrement(@RequestAttribute("position") String[] position,
+    public ApiResponseList<Map<String, Object>> jobTimeMoMIncrement(@RequestAttribute("position") String position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -177,7 +177,7 @@ public class WebChartController {
             boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
 
             BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
-            for (String item : position){
+            for (String item : position.split(",")){
                 boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
             boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
@@ -236,7 +236,7 @@ public class WebChartController {
     }
 
     @GetMapping(value = "/positionSalaryChart")
-    public ApiResponseList<Map<String, Object>> positionSalaryChart(@RequestAttribute("position") String[] position,
+    public ApiResponseList<Map<String, Object>> positionSalaryChart(@RequestAttribute("position") String position,
                                                                     @RequestParam("edu") String edu,
                                                                     @RequestParam("exp") String exp,
                                                                     @RequestParam("city") String city,
@@ -253,7 +253,7 @@ public class WebChartController {
             boolQueryBuilder.must().add(QueryBuilders.matchPhraseQuery("city", city));
 
             BoolQueryBuilder boolQueryBuilderShouldPos = QueryBuilders.boolQuery();
-            for (String item : position){
+            for (String item : position.split(",")){
                 boolQueryBuilderShouldPos.should().add(QueryBuilders.matchPhraseQuery("position", item));
             }
             boolQueryBuilder.must().add(boolQueryBuilderShouldPos);
