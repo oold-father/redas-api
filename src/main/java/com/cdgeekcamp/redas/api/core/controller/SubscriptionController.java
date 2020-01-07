@@ -2,6 +2,8 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
+import com.cdgeekcamp.redas.db.model.User;
+import com.cdgeekcamp.redas.db.model.UserRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ public class SubscriptionController {
     @Autowired
     private EntityManagerFactoryToResult entityManagerFactoryToResult;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping(value = "/allSubList")
     public ApiResponseX allSubList(@RequestParam("search_type") String searchType,
                                    @RequestParam("search") String search,
@@ -24,14 +29,19 @@ public class SubscriptionController {
         Integer pagenum = new Pagination().Page(page);
         String sql = "";
         if("".equals(search)){
-            sql = "select a.hash_key,GROUP_CONCAT(a.key_name),user.name FROM " +
-                    "(select s.id,s.hash_key,s.user_id,k.key_name from subscription as s inner JOIN keywords as k " +
-                    "on s.keyword_id=k.id) as a inner JOIN `user` on a.user_id=user.id GROUP BY a.hash_key";
+            sql = "select (select name from `user` where id=s.user_id) as username,GROUP_CONCAT(k.key_name) as keyname " +
+                    "from subscription s left join keywords k on k.id = s.keyword_id GROUP by s.hash_key";
         }else {
-            String sqlString = "select a.hash_key,GROUP_CONCAT(k.key_name),a.name from keywords as k inner join " +
-                    "(select user.name,s.hash_key,s.keyword_id FROM user inner JOIN subscription as s on user.id=s.user_id) " +
-                    "as a on a.keyword_id=k.id group by a.hash_key having name=\"%s\"";
-            sql = String.format(sqlString, search);
+            Optional<User> optionalUser = userRepository.findByName(search);
+            if (optionalUser.isPresent()){
+                User user = optionalUser.get();
+                int user_id = user.getId();
+                String sqlString = "select (select name from `user` where id=s.user_id) as username,GROUP_CONCAT(k.key_name) as keyname " +
+                        "from subscription s left join keywords k on k.id = s.keyword_id where s.user_id=\"%d\" GROUP by s.hash_key";
+                sql = String.format(sqlString, user_id);
+            }else {
+                return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
+            }
         }
 
         List<Object[]> resultList = entityManagerFactoryToResult.sqlToResultPage(sql, pagenum, size);
@@ -41,7 +51,7 @@ public class SubscriptionController {
         try {
             for (Object[] result : resultList) {
                 Map<String, String> map = new HashMap<>();
-                map.put("username", result[2].toString());
+                map.put("username", result[0].toString());
                 map.put("keywords", result[1].toString());
                 resList.add(map);
             }
