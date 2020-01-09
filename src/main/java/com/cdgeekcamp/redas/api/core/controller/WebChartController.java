@@ -1,6 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.PositionSalaryArray;
+import com.cdgeekcamp.redas.api.core.service.esService;
 import com.cdgeekcamp.redas.db.model.KeyWords;
 import com.cdgeekcamp.redas.db.model.KeyWordsRepository;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
@@ -47,6 +48,9 @@ public class WebChartController {
 
     @Autowired
     private EsApiCoreConfig esApiCoreConfig;
+
+    @Autowired
+    private esService esServices;
 
 
     @GetMapping(value = "/getTerm")
@@ -106,8 +110,7 @@ public class WebChartController {
                                                                     @RequestParam("endDate") String endDate) throws IOException {
         try{
 
-            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
-                            new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
+            RestHighLevelClient client = esServices.getClient();
 
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             boolQueryBuilder.must().add(QueryBuilders.rangeQuery("publishTime").gte(startDate).lte(endDate));
@@ -169,8 +172,7 @@ public class WebChartController {
                                                                     @RequestParam("endDate") String endDate) throws IOException {
         try{
 
-            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
-                    new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
+            RestHighLevelClient client = esServices.getClient();
 
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             boolQueryBuilder.must().add(QueryBuilders.rangeQuery("publishTime").gte(startDate).lte(endDate));
@@ -244,8 +246,7 @@ public class WebChartController {
                                                                     @RequestParam("endDate") String endDate) throws IOException {
         try{
 
-            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
-                    new HttpHost(esApiCoreConfig.getHost(), esApiCoreConfig.getPort(), esApiCoreConfig.getScheme())));
+            RestHighLevelClient client = esServices.getClient();
 
             // 查询bool
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();

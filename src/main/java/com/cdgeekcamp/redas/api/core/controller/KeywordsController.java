@@ -1,6 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 
+import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.KeyWords;
 import com.cdgeekcamp.redas.db.model.KeyWordsRepository;
 import com.cdgeekcamp.redas.db.model.Nature;
@@ -33,16 +34,11 @@ public class KeywordsController {
             @RequestParam(name = "page", defaultValue= "0", required=false) Integer page,
             @RequestParam(name = "maxEle", defaultValue= "20", required=false) Integer maxEle) {
 
-        if(page <= 0){
-            page = 0;
-        }else {
-            page = page-1;
-        }
+        Integer pageNum = new Pagination().Page(page);
 
-        Pageable pageable = PageRequest.of(page, maxEle, Sort.Direction.ASC, "Id");
+        Pageable pageable = PageRequest.of(pageNum, maxEle, Sort.Direction.ASC, "Id");
         Page<KeyWords> keyWords = keyWordsRepository.findAll(pageable);
 
-//        Iterable<KeyWords> keyWords  = keyWordsRepository.findAll();
         ArrayList<Object> keyWords_list = new ArrayList<>();
         for (KeyWords item: keyWords){
             Map<Object, Object> newNode = new HashMap<>();

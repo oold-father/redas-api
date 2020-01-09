@@ -4,6 +4,7 @@ import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.User;
 import com.cdgeekcamp.redas.db.model.UserRepository;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ public class SubscriptionController {
     private UserRepository userRepository;
 
     @GetMapping(value = "/allSubList")
-    public ApiResponseX allSubList(@RequestParam("search_type") String searchType,
-                                   @RequestParam("search") String search,
-                                   @RequestParam("page") Integer page,
-                                   @RequestParam("size") Integer size){
+    public ApiResponse allSubList(@RequestParam("search_type") String searchType,
+                                  @RequestParam("search") String search,
+                                  @RequestParam("page") Integer page,
+                                  @RequestParam("size") Integer size){
         Integer pagenum = new Pagination().Page(page);
         String sql = "";
         if("".equals(search)){

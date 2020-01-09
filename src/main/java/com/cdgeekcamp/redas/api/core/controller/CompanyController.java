@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.Company;
 import com.cdgeekcamp.redas.db.model.CompanyRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
@@ -24,13 +25,10 @@ public class CompanyController {
     private CompanyRepository companyRepository;
 
     @GetMapping(value = "/getCompanyList")
-    public ApiResponseX getCompanyList(@PathParam("page") Integer page){
-        if(page == null || page <= 0){
-            page = 0;
-        }else {
-            page = page-1;
-        }
-        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+    public ApiResponseX<LinkedHashMap<String, Object>> getCompanyList(@PathParam("page") Integer page){
+        Integer pageNum = new Pagination().Page(page);
+
+        Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<Company> companies = companyRepository.findAll(pageable);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();

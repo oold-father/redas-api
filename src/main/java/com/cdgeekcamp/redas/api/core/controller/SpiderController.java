@@ -1,6 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.controller.json.SpiderJson;
+import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.PositionUrl;
 import com.cdgeekcamp.redas.db.model.Spider;
 import com.cdgeekcamp.redas.db.model.SpiderRepository;
@@ -85,12 +86,9 @@ public class SpiderController {
 
     @GetMapping(value = "list")
     public ApiResponse getSpiderList(@PathParam("page") Integer page) {
-        if(page == null || page <= 0){
-            page = 0;
-        }else {
-            page = page-1;
-        }
-        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+        Integer pageNum = new Pagination().Page(page);
+
+        Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<Spider> spider = spiders.findAll(pageable);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();

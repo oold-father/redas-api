@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.*;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlInfo;
@@ -96,13 +97,10 @@ public class PositionUrlController {
     }
 
     @GetMapping(value = "/getUrlList")
-    public ApiResponseX getPositionUrlList(@PathParam("page") Integer page){
-        if(page == null || page <= 0){
-            page = 0;
-        }else {
-            page = page-1;
-        }
-        Pageable pageable = PageRequest.of(page, 20, Sort.Direction.ASC, "Id");
+    public ApiResponseX<LinkedHashMap<String, Object>> getPositionUrlList(@PathParam("page") Integer page){
+        Integer pageNum = new Pagination().Page(page);
+
+        Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<PositionUrl> posUrls = positionUrls.findAll(pageable);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
