@@ -1,0 +1,20 @@
+[Unit]
+Description=Redas Api Core Service
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+Environment="PORT=8080"
+Environment="CONFIG_FILE=/data/web/redas-api-core/application.yml"
+Environment="JAR_FILE=/data/web/redas-api-core/redas-api-core-1.0.0.jar"
+
+User=redas
+Group=redas
+WorkingDirectory=/data/web/redas-api-core
+ExecStart=/usr/bin/java -Dserver.port=${PORT} -Dspring.config.location=${CONFIG_FILE} -jar ${JAR_FILE}
+SuccessExitStatus=143
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
