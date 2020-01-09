@@ -1,10 +1,9 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.controller.json.SpiderJson;
+import com.cdgeekcamp.redas.api.core.service.ModifyUrlStatusService;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
-import com.cdgeekcamp.redas.db.model.PositionUrl;
-import com.cdgeekcamp.redas.db.model.Spider;
-import com.cdgeekcamp.redas.db.model.SpiderRepository;
+import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
@@ -17,15 +16,16 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/spider")
 public class SpiderController {
     @Autowired
     private SpiderRepository spiders;
+
+    @Autowired
+    private ModifyUrlStatusService modifyUrlStatusService;
 
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addSpider(@RequestBody SpiderJson spiderJson) {
@@ -104,5 +104,14 @@ public class SpiderController {
 
         return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
 
+    }
+
+    @GetMapping(value = "/modifyUrlStatus")
+    public void modifyUrlStatus(@RequestParam("spider") String spider){
+        if (spider.equals("list")){
+            modifyUrlStatusService.modifyPositionsUrlStatus();
+        }else if (spider.equals("detail")){
+            modifyUrlStatusService.modifyPositionUrlStatus();
+        }
     }
 }
