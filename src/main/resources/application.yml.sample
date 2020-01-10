@@ -1,6 +1,3 @@
-logging:
-  file: /tmp/redas_api_core.log
-
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/redas?serverTimezone=Asia/Shanghai&useUnicode=yes&characterEncoding=UTF-8

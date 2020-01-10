@@ -7,11 +7,12 @@ Type=simple
 Environment="PORT=8080"
 Environment="CONFIG_FILE=/data/web/redas-api-core/application.yml"
 Environment="JAR_FILE=/data/web/redas-api-core/redas-api-core-1.0.0.jar"
+Environment="LOG_FILE=/data/web/redas-api-core/error.log"
 
 User=redas
 Group=redas
 WorkingDirectory=/data/web/redas-api-core
-ExecStart=/usr/bin/java -Dserver.port=${PORT} -Dspring.config.location=${CONFIG_FILE} -jar ${JAR_FILE}
+ExecStart=/usr/bin/java -Dlogging.file=${LOG_FILE} -Dserver.port=${PORT} -Dspring.config.location=${CONFIG_FILE} -jar ${JAR_FILE}
 SuccessExitStatus=143
 StandardOutput=null
 StandardError=journal
