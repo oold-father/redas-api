@@ -1,7 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.Pagination;
-import com.cdgeekcamp.redas.api.core.service.esService;
+import com.cdgeekcamp.redas.api.core.service.EsService;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
@@ -11,11 +11,6 @@ import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
 import com.cdgeekcamp.redas.lib.core.jsonObject.JsonObject;
 import com.cdgeekcamp.redas.lib.core.util.EduLevelMap;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpHost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.nio.entity.NStringEntity;
-import org.apache.http.util.EntityUtils;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -28,20 +23,12 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedLongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,22 +37,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/es")
-public class esController {
+public class EsController {
     @Autowired
     private EsApiCoreConfig esApiCoreConfig;
 
     @Autowired
-    private esService esService;
+    private EsService esService;
 
     @GetMapping(value = "/positions")
     public ApiResponse esGetPositions(

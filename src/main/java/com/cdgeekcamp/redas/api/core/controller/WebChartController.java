@@ -1,7 +1,7 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.PositionSalaryArray;
-import com.cdgeekcamp.redas.api.core.service.esService;
+import com.cdgeekcamp.redas.api.core.service.EsService;
 import com.cdgeekcamp.redas.db.model.KeyWords;
 import com.cdgeekcamp.redas.db.model.KeyWordsRepository;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
@@ -9,11 +9,9 @@ import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -50,7 +48,7 @@ public class WebChartController {
     private EsApiCoreConfig esApiCoreConfig;
 
     @Autowired
-    private esService esServices;
+    private EsService esServices;
 
 
     @GetMapping(value = "/getTerm")
