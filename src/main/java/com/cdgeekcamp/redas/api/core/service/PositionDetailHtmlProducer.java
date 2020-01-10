@@ -21,7 +21,6 @@ public class PositionDetailHtmlProducer implements ProducerBase {
 
     private static KafkaProducer<String, String> lastConn;
 
-    @Bean
     @Override
     public KafkaProducer<String, String> getProducer() {
         Properties p = new Properties();

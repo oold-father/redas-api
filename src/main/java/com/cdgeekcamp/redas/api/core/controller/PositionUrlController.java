@@ -83,7 +83,12 @@ public class PositionUrlController {
                 HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
 
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(config.getMqAddUrl(), HttpMethod.POST,request, ApiResponse.class);
+                ResponseEntity<ApiResponse> response = null;
+                try{
+                    response= restTemplate.exchange(config.getMqAddUrl(), HttpMethod.POST,request, ApiResponse.class);
+                }catch (Exception e){
+                }
+
                 // 添加成功，url状态改为1
                 if(Objects.requireNonNull(response.getBody()).getCode() == ResponseCode.SUCCESS){
                     result.setState(1);
