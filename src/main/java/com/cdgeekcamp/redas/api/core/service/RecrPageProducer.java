@@ -11,6 +11,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,20 +26,34 @@ public class RecrPageProducer implements ProducerBase {
     @Autowired
     private PositionUrlRepository positionUrlRepository;
 
+    private static KafkaProducer<String, String> lastConn;
+
+    @Bean
     @Override
-    public ApiResponse producerHandle(String stringToMq){
+    public KafkaProducer<String, String> getProducer() {
         Properties p = new Properties();
         p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, redasMqConfig.getHost());
         p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
-        try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p)) {
-            ProducerRecord<String, String> record = new ProducerRecord<>(redasMqConfig.getTopic(), stringToMq);
+        if(RecrPageProducer.lastConn == null) {
+            RecrPageProducer.lastConn = new KafkaProducer<>(p);
+        }
+        return RecrPageProducer.lastConn;
+    }
+
+
+    @Override
+    public ApiResponse producerHandle(String stringToMq){
+        ProducerRecord<String, String> record = new ProducerRecord<>(redasMqConfig.getTopic(), stringToMq);
+        KafkaProducer<String, String> kafkaProducer = this.getProducer();
+        try {
             kafkaProducer.send(record);
-            System.out.println("消息发送成功:" + stringToMq);
         }catch (Exception e){
+            RecrPageProducer.lastConn = null;
             return new ApiResponse(ResponseCode.FAILED, "上报失败");
         }
+        System.out.println("消息发送成功:" + stringToMq);
         return new ApiResponse(ResponseCode.SUCCESS, "上报成功");
     }
 
