@@ -39,9 +39,11 @@ redas:
     group: position_detail_html
     topic: position_detail_html
   elasticsearch:
-    api_core:
+    position:
       scheme: http
       host: 192.168.0.6
       port: 9200
       index: redas
       type: position
+require_api:
+  mq_add_url: http://host:port/router/to/send_msg_to_es

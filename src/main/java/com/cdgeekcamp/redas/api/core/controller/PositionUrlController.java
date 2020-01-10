@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.Config;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.*;
@@ -30,6 +31,9 @@ public class PositionUrlController {
 
     @Autowired
     R_PositionsPositionUrlRepository r_PositionsPositionUrl;
+
+    @Autowired
+    Config config;
 
     @PostMapping(value = "/addUrl", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody UrlsToDB urlsToDB) {
@@ -70,7 +74,6 @@ public class PositionUrlController {
             // 状态为0的url发送到消息队列
             if(result.isState() == 0){
                 // 发送到消息队列
-                String apiUrl = "http://127.0.0.1:8080/mq/addPositionUrl";
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
@@ -80,7 +83,7 @@ public class PositionUrlController {
                 HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
 
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(apiUrl, HttpMethod.POST,request, ApiResponse.class);
+                ResponseEntity<ApiResponse> response = restTemplate.exchange(config.getMqAddUrl(), HttpMethod.POST,request, ApiResponse.class);
                 // 添加成功，url状态改为1
                 if(Objects.requireNonNull(response.getBody()).getCode() == ResponseCode.SUCCESS){
                     result.setState(1);
