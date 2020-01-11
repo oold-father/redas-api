@@ -6,6 +6,7 @@ import com.cdgeekcamp.redas.api.core.service.PositionUrlProducer;
 import com.cdgeekcamp.redas.api.core.service.PositionsUrlHtmlProducer;
 import com.cdgeekcamp.redas.api.core.service.RecrPageProducer;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
+import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.HtmlToMq;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlToMq;
@@ -54,7 +55,10 @@ public class MqController {
     public ApiResponse mqAddRecrPage(@RequestBody RecrPage recrPage) {
         JsonObject<RecrPage> htmlJson = new JsonObject();
         String data = htmlJson.toJson(recrPage);
-        recrPageProducer.urlStateHandle(recrPage);
+        ApiResponse apiResponse = recrPageProducer.producerHandle(data);
+        if ((ResponseCode.SUCCESS).equals(apiResponse.getCode())){
+            recrPageProducer.urlStateHandle(recrPage);
+        }
         return recrPageProducer.producerHandle(data);
     }
 }
