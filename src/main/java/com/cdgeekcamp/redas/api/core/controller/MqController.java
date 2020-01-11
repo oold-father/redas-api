@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping(value = "/mq")
 public class MqController {
@@ -37,7 +39,7 @@ public class MqController {
     }
 
     @PostMapping(value = "addPositionUrl")
-    public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq) {
+    public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq){
         return positionUrlProducer.producerHandle(urlToMq.getUrl());
     }
 
