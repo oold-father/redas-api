@@ -113,16 +113,35 @@ public class EsController {
         // 查询到的数据列表前10个
         SearchHit[] searchHits = hits.getHits();
 
-        ArrayList<Map> resultList = new ArrayList<>();
+        ArrayList<Map<String, Object>> resultList = new ArrayList<>();
 
         for (SearchHit hit : searchHits) {
             // do something with the SearchHit
 
             Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-            resultList.add(sourceAsMap);
+            Map<String, Object> positionInfo = new HashMap<>();
+            String posDesc = sourceAsMap.get("posDesc").toString();
+
+            positionInfo.put("address", sourceAsMap.get("address"));
+            positionInfo.put("advantage", sourceAsMap.get("advantage"));
+            positionInfo.put("city", sourceAsMap.get("city"));
+            positionInfo.put("companyName", sourceAsMap.get("companyName"));
+            positionInfo.put("companyNature", sourceAsMap.get("companyNature"));
+            positionInfo.put("edu", sourceAsMap.get("edu"));
+            positionInfo.put("exp", sourceAsMap.get("exp"));
+            positionInfo.put("posDesc", posDesc.split("\n"));
+            positionInfo.put("position", sourceAsMap.get("position"));
+            positionInfo.put("publishTime", sourceAsMap.get("publishTime"));
+            positionInfo.put("salary", sourceAsMap.get("salary"));
+            positionInfo.put("scale", sourceAsMap.get("scale"));
+            positionInfo.put("stage", sourceAsMap.get("stage"));
+            positionInfo.put("tagList", sourceAsMap.get("tagList"));
+
+
+            resultList.add(positionInfo);
         }
 
-        ApiResponseMap result = new ApiResponseMap<>(ResponseCode.SUCCESS, "搜索成功");
+        ApiResponseMap<String, Object> result = new ApiResponseMap<>(ResponseCode.SUCCESS, "搜索成功");
         result.addKeyAndValue("totalFind", numHits);
         result.addKeyAndValue("Hits", resultList);
 
@@ -262,7 +281,7 @@ public class EsController {
                 .getAggregations();
 
         ParsedLongTerms count_position = aggs.get("count_position");
-        ApiResponseList<Map> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "获取成功");
+        ApiResponseList<Map<Object, Object>> responseList = new ApiResponseList<>(ResponseCode.SUCCESS, "获取成功");
 
         Map<Object, Object> moreThan5Map = new HashMap<>();
         moreThan5Map.put("name", "5年");

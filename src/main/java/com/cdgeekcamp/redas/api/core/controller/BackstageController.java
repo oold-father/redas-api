@@ -1,5 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.Config;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
@@ -24,14 +25,15 @@ public class BackstageController {
     @Autowired
     NatureRepository nature;
 
+    @Autowired
+    Config config;
+
     @GetMapping(value = "/positionUrl/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestParam Integer isAdd) {
         if (isAdd == 0){
             Iterable<PositionUrl> result = positionUrls.findAllByState(0);
             Integer num = 0;
             for (PositionUrl item: result){
-
-                String url = "http://127.0.0.1:8080/mq/addPositionUrl";
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
@@ -41,7 +43,7 @@ public class BackstageController {
                 HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
 
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(url, HttpMethod.POST,request, ApiResponse.class);
+                ResponseEntity<ApiResponse> response = restTemplate.exchange(config.getMqAddUrl(), HttpMethod.POST,request, ApiResponse.class);
                 // 添加成功，url状态改为1
                 if(Objects.requireNonNull(response.getBody()).getCode() == ResponseCode.SUCCESS){
                     item.setState(1);
