@@ -2,8 +2,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
-import com.cdgeekcamp.redas.db.model.User;
-import com.cdgeekcamp.redas.db.model.UserRepository;
+import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
@@ -22,6 +21,9 @@ public class SubscriptionController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
+
     @GetMapping(value = "/allSubList")
     public ApiResponse allSubList(@RequestParam("search_type") String searchType,
                                   @RequestParam("search") String search,
@@ -30,14 +32,14 @@ public class SubscriptionController {
         Integer pagenum = new Pagination().Page(page);
         String sql = "";
         if("".equals(search)){
-            sql = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname from subscription as s " +
+            sql = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname,s.hash_key from subscription as s " +
                     "left join keywords as k on k.id = s.keyword_id left join `user` as u on u.id=s.user_id GROUP by s.hash_key";
         }else {
             Optional<User> optionalUser = userRepository.findByName(search);
             if (optionalUser.isPresent()){
                 User user = optionalUser.get();
                 int user_id = user.getId();
-                String sqlString = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname " +
+                String sqlString = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname,s.hash_key " +
                         "from subscription as s left join keywords as k on k.id = s.keyword_id left join `user` as u " +
                         "on u.id=s.user_id where s.user_id=\"%d\" GROUP by s.hash_key";
                 sql = String.format(sqlString, user_id);
@@ -55,6 +57,7 @@ public class SubscriptionController {
                 Map<String, String> map = new HashMap<>();
                 map.put("username", result[0].toString());
                 map.put("keywords", result[1].toString());
+                map.put("hash_key", result[2].toString());
                 resList.add(map);
             }
 
@@ -66,5 +69,25 @@ public class SubscriptionController {
         }catch (Exception e){
             return new ApiResponseX<>(ResponseCode.FAILED, "失败", new HashMap<>());
         }
+    }
+
+    @GetMapping(value = "/deleteSub")
+    public ApiResponse deleteSub(@RequestParam("username") String username,
+                          @RequestParam("hash_key") String hash_key){
+        Optional<User> userOptional = userRepository.findByName(username);
+        List<Subscription> subscriptions = subscriptionRepository.findByHashKey(hash_key);
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
+
+            for (Subscription subscription: subscriptions){
+                if (user.getId().equals(subscription.getUserId())){
+                    subscriptionRepository.deleteById(subscription.getId());
+                }
+            }
+
+            return new ApiResponse(ResponseCode.SUCCESS, "删除成功");
+        }
+
+        return new ApiResponse(ResponseCode.FAILED, "删除失败");
     }
 }
