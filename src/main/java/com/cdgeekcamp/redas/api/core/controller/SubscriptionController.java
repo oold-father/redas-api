@@ -2,14 +2,20 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
-import com.cdgeekcamp.redas.db.model.User;
-import com.cdgeekcamp.redas.db.model.UserRepository;
+import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
+import com.cdgeekcamp.redas.lib.core.api.receivedParameter.HtmlToMq;
+import com.cdgeekcamp.redas.lib.core.util.RedasString;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @RestController
@@ -21,6 +27,15 @@ public class SubscriptionController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserOpenRepository userOpenRepository;
+
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    private KeyWordsRepository keyWordsRepository;
 
     @GetMapping(value = "/allSubList")
     public ApiResponse allSubList(@RequestParam("search_type") String searchType,
@@ -67,4 +82,40 @@ public class SubscriptionController {
             return new ApiResponseX<>(ResponseCode.FAILED, "失败", new HashMap<>());
         }
     }
+
+    @PostMapping(value = "add")
+    public ApiResponse allSubList(@RequestParam(name = "openId")String openId,
+                                  @RequestParam(name = "type", defaultValue = "redas")String type,
+                                  @RequestBody Object content
+    ) throws NoSuchAlgorithmException {
+        // 根据openId判断用户是否存在， 不存在则创建用户
+        Optional<UserOpen> userOpen = userOpenRepository.findByOpenId(openId);
+        UserOpen newUserOpen = null;
+        if (userOpen.isEmpty()){
+            //  生成一个16位随机字符串
+            String userStr = RandomStringUtils.randomAlphanumeric(16);
+            User newUser = userRepository.save(new User(type + "_" + userStr, userStr, userStr));
+            newUserOpen = userOpenRepository.save(new UserOpen(newUser.getId(), openId, type));
+        }
+
+        if(newUserOpen == null){
+            newUserOpen = userOpen.get();
+        }
+
+        LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap)content;
+        if(linkedHashMap.isEmpty()){
+            return new ApiResponse(ResponseCode.SUCCESS, "未选择任何主题");
+        }
+        String baseString = openId + type + RedasString.getNowTimeStamp().toString();
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(baseString.getBytes(StandardCharsets.UTF_8));
+        String hashStr = RedasString.bytesToHex(hash);
+
+        Integer userId = newUserOpen.getUserId();
+        for(Map.Entry<String, Object> entry : linkedHashMap.entrySet()) {
+            subscriptionRepository.save(new Subscription(userId, (Integer) entry.getValue(), hashStr));
+        }
+        return new ApiResponse(ResponseCode.SUCCESS, "订阅成功");
+    }
+
 }
