@@ -2,12 +2,12 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.api.core.service.EsService;
+import com.cdgeekcamp.redas.api.core.config.EsConfig;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import com.cdgeekcamp.redas.lib.core.api.receivedParameter.RecrPage;
-import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
 import com.cdgeekcamp.redas.lib.core.jsonObject.JsonObject;
 import com.cdgeekcamp.redas.lib.core.util.EduLevelMap;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping(value = "/es")
 public class EsController {
     @Autowired
-    private EsApiCoreConfig esApiCoreConfig;
+    private EsConfig esConfig;
 
     @Autowired
     private EsService esService;
@@ -75,7 +75,7 @@ public class EsController {
         paramMap.put("companyNature", nature);
 
 
-        SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex());
+        SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
@@ -162,7 +162,7 @@ public class EsController {
 
         String jsonString = new JsonObject<RecrPage>().toJson(recrPage);
 
-        IndexRequest request = new IndexRequest(esApiCoreConfig.getIndex())
+        IndexRequest request = new IndexRequest(esConfig.getIndex())
                 .id(id)
                 .source(jsonString, XContentType.JSON);
 
@@ -214,7 +214,7 @@ public class EsController {
                 )
                 .size(0);
 
-        SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex())
+        SearchRequest searchRequest = new SearchRequest(esConfig.getIndex())
                 .source(searchSourceBuilder);
 
         Aggregations aggs = esService.getClient()
@@ -273,7 +273,7 @@ public class EsController {
                 )
                 .size(0);
 
-        SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex())
+        SearchRequest searchRequest = new SearchRequest(esConfig.getIndex())
                 .source(searchSourceBuilder);
 
         Aggregations aggs = esService.getClient()

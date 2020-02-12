@@ -1,6 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.Config;
+import com.cdgeekcamp.redas.api.core.config.RequireApiConfig;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.*;
@@ -33,7 +33,7 @@ public class PositionUrlController {
     R_PositionsPositionUrlRepository r_PositionsPositionUrl;
 
     @Autowired
-    Config config;
+    RequireApiConfig config;
 
     @PostMapping(value = "/addUrl", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody UrlsToDB urlsToDB) {

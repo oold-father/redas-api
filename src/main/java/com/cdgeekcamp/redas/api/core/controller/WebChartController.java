@@ -2,13 +2,13 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.PositionSalaryArray;
 import com.cdgeekcamp.redas.api.core.service.EsService;
+import com.cdgeekcamp.redas.api.core.config.EsConfig;
 import com.cdgeekcamp.redas.db.model.KeyWords;
 import com.cdgeekcamp.redas.db.model.KeyWordsRepository;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
-import com.cdgeekcamp.redas.lib.core.esConfig.EsApiCoreConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -45,7 +45,7 @@ public class WebChartController {
     private PositionRepository positionRepository;
 
     @Autowired
-    private EsApiCoreConfig esApiCoreConfig;
+    private EsConfig esConfig;
 
     @Autowired
     private EsService esServices;
@@ -131,7 +131,7 @@ public class WebChartController {
             searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 
             // 创建SearchRequest请求
-            SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex());
+            SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
             searchRequest.source(searchSourceBuilder);
 
             // 发送请求， 获取结果
@@ -197,7 +197,7 @@ public class WebChartController {
             searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 
             // 创建SearchRequest请求
-            SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex());
+            SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
             searchRequest.source(searchSourceBuilder);
 
             // 发送请求， 获取结果
@@ -305,7 +305,7 @@ public class WebChartController {
             searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
 
             // 创建SearchRequest请求
-            SearchRequest searchRequest = new SearchRequest(esApiCoreConfig.getIndex());
+            SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
             searchRequest.source(searchSourceBuilder);
 
             // 发送请求， 获取结果
