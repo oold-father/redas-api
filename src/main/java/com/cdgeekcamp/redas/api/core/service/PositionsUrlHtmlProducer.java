@@ -1,8 +1,8 @@
 package com.cdgeekcamp.redas.api.core.service;
 
+import com.cdgeekcamp.redas.api.core.config.PositionsUrlHtmlMqConfig;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
-import com.cdgeekcamp.redas.lib.core.mqConfig.PositionsUrlHtmlMqConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -11,7 +11,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.Properties;

@@ -1,24 +1,19 @@
 package com.cdgeekcamp.redas.api.core.service;
 
+import com.cdgeekcamp.redas.api.core.config.PositionUrlMqConfig;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
-import com.cdgeekcamp.redas.lib.core.mqConfig.PositionUrlMqConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.Metric;
-import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Service
