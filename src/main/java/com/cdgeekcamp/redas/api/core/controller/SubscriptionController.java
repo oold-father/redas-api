@@ -2,6 +2,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
+import com.cdgeekcamp.redas.api.core.service.SubscriptionService;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
@@ -35,6 +36,17 @@ public class SubscriptionController {
     @Autowired
     private KeyWordsRepository keyWordsRepository;
 
+    @Autowired
+    private SubscriptionService subscriptionService;
+
+    /**
+     * 获取所有的订阅
+     * @param searchType 查询类型
+     * @param search 查询条件
+     * @param page 页码
+     * @param size 每页条数
+     * @return ApiResponse
+     */
     @GetMapping(value = "/allSubList")
     public ApiResponse allSubList(@RequestParam("search_type") String searchType,
                                   @RequestParam("search") String search,
@@ -59,29 +71,17 @@ public class SubscriptionController {
             }
         }
 
-        List<Object[]> resultList = entityManagerFactoryToResult.sqlToResultPage(sql, pagenum, size);
-
-        ArrayList<Map<String, String>> resList = new ArrayList<>();
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            for (Object[] result : resultList) {
-                Map<String, String> map = new HashMap<>();
-                map.put("username", result[0].toString());
-                map.put("keywords", result[1].toString());
-                map.put("hash_key", result[2].toString());
-                resList.add(map);
-            }
-
-            resultMap.put("totalElements", entityManagerFactoryToResult.sqlToResult(sql).size());
-            resultMap.put("page", page);
-            resultMap.put("SubList", resList);
-
-            return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
-        }catch (Exception e){
-            return new ApiResponseX<>(ResponseCode.FAILED, "失败", new HashMap<>());
-        }
+        return subscriptionService.getAllOrUserSubList(sql, pagenum, size, page);
     }
 
+    /**
+     * 查询用户的订阅列表
+     * @param searchType 查询类型
+     * @param open_id open_id
+     * @param page 页码
+     * @param size 每页条数
+     * @return ApiResponse
+     */
     @GetMapping(value = "/userSubList")
     public ApiResponse userSubList(@RequestParam("search_type") String searchType,
                                   @RequestParam("open_id") String open_id,
@@ -109,32 +109,19 @@ public class SubscriptionController {
             return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
         }
 
-        List<Object[]> resultList = entityManagerFactoryToResult.sqlToResultPage(sql, pagenum, size);
-
-        ArrayList<Map<String, String>> resList = new ArrayList<>();
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            for (Object[] result : resultList) {
-                Map<String, String> map = new HashMap<>();
-                map.put("username", result[0].toString());
-                map.put("keywords", result[1].toString());
-                map.put("hash_key", result[2].toString());
-                resList.add(map);
-            }
-
-            resultMap.put("totalElements", entityManagerFactoryToResult.sqlToResult(sql).size());
-            resultMap.put("page", page);
-            resultMap.put("SubList", resList);
-
-            return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
-        }catch (Exception e){
-            return new ApiResponseX<>(ResponseCode.FAILED, "失败", new HashMap<>());
-        }
+        return subscriptionService.getAllOrUserSubList(sql, pagenum, size, page);
     }
 
-
+    /**
+     * 添加订阅
+     * @param openId open_id
+     * @param type 登陆平台类型
+     * @param content 订阅
+     * @return ApiResponse
+     * @throws NoSuchAlgorithmException
+     */
     @PostMapping(value = "add")
-    public ApiResponse allSubList(@RequestParam(name = "openId")String openId,
+    public ApiResponse addSub(@RequestParam(name = "openId")String openId,
                                   @RequestParam(name = "type", defaultValue = "redas")String type,
                                   @RequestBody Object content
     ) throws NoSuchAlgorithmException {
@@ -174,7 +161,12 @@ public class SubscriptionController {
 
     }
 
-
+    /**
+     * 删除订阅
+     * @param open_id open_id
+     * @param hash_key hash_key
+     * @return ApiResponse
+     */
     @GetMapping(value = "/deleteSub")
     public ApiResponse deleteSub(@RequestParam("open_id") String open_id,
                           @RequestParam("hash_key") String hash_key){

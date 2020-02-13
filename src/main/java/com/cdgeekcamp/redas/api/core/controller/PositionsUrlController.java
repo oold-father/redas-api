@@ -28,6 +28,11 @@ public class PositionsUrlController {
     @Autowired
     private PositionsUrlRepository PositionsUrls;
 
+    /**
+     * 添加职位列表url
+     * @param positionUrlJsonClass 职位列表url(json)
+     * @return ApiResponse
+     */
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody PositionUrl positionUrlJsonClass) {
         String url = positionUrlJsonClass.getUrl();
@@ -42,6 +47,10 @@ public class PositionsUrlController {
         }
     }
 
+    /**
+     * 获取职位列表url
+     * @return ApiResponse
+     */
     @GetMapping(value = "get")
     public ApiResponse getPositionsUrl() {
         Iterable<PositionsUrl> result = PositionsUrls.findByState(0);
@@ -59,8 +68,13 @@ public class PositionsUrlController {
         return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",response);
     }
 
+    /**
+     * 获取职位列表url的列表
+     * @param page 页码
+     * @return ApiResponse
+     */
     @GetMapping(value = "/getPostionsUrlList")
-    public ApiResponseX<LinkedHashMap<String, Object>> getPositionsUrlList(@PathParam("page") Integer page){
+    public ApiResponse getPositionsUrlList(@PathParam("page") Integer page){
         Integer pageNum = new Pagination().Page(page);
 
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");

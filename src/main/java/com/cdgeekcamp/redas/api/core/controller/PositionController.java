@@ -3,6 +3,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.Position;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,13 @@ public class PositionController {
     @Autowired
     private PositionRepository positionRepository;
 
+    /**
+     * 获取职位列表
+     * @param page 页码
+     * @return ApiResponse
+     */
     @GetMapping(value = "/getPositionList")
-    public ApiResponseX<LinkedHashMap<String, Object>> getPositionList(@PathParam("page") Integer page){
+    public ApiResponse getPositionList(@PathParam("page") Integer page){
         Integer pageNum = new Pagination().Page(page);
 
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");

@@ -1,5 +1,6 @@
-package com.cdgeekcamp.redas.api.core.service;
+package com.cdgeekcamp.redas.api.core.config;
 
+import com.cdgeekcamp.redas.api.core.service.EsInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -20,6 +21,10 @@ public class CorsConfig implements WebMvcConfigurer {
     }
 
 
+    /**
+     * 拦截器
+     * @param  registry registry
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 

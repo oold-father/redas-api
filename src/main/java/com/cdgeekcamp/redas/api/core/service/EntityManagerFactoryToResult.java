@@ -13,6 +13,13 @@ public class EntityManagerFactoryToResult {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
+    /**
+     * 通过sql语句查询结果，分页查询
+     * @param sql sql语句
+     * @param page 页码
+     * @param size 每页条数
+     * @return List
+     */
     public List<Object[]> sqlToResultPage(String sql, Integer page, Integer size){
         EntityManager em = entityManagerFactory.createEntityManager();
         Query query = em.createNativeQuery(sql);
@@ -26,6 +33,11 @@ public class EntityManagerFactoryToResult {
         return resultList;
     }
 
+    /**
+     * 通过sql语句查询结果，不分页查询
+     * @param sql sql语句
+     * @return List
+     */
     public List<Object[]> sqlToResult(String sql){
         EntityManager em = entityManagerFactory.createEntityManager();
         Query query = em.createNativeQuery(sql);

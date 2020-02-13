@@ -5,6 +5,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 拦截器
+ */
 public class EsInterceptor implements HandlerInterceptor {
 
     @Override
