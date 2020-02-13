@@ -2,10 +2,10 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.config.RequireApiConfig;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
+import com.cdgeekcamp.redas.api.core.controller.json.UrlInfo;
+import com.cdgeekcamp.redas.api.core.controller.json.UrlsToDB;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.*;
-import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlInfo;
-import com.cdgeekcamp.redas.lib.core.api.receivedParameter.UrlsToDB;
 import com.cdgeekcamp.redas.lib.core.util.RedasString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

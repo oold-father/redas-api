@@ -1,13 +1,13 @@
 package com.cdgeekcamp.redas.api.core.controller.json;
 
-public class PositionUrlJsonClass {
+public class PositionUrlJson {
     private String url;
     private Integer maxSize;
 
-    public PositionUrlJsonClass() {
+    public PositionUrlJson() {
     }
 
-    public PositionUrlJsonClass(String url, Integer maxSize) {
+    public PositionUrlJson(String url, Integer maxSize) {
         this.url = url;
         this.maxSize = maxSize;
     }
