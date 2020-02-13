@@ -1,16 +1,16 @@
 package com.cdgeekcamp.redas.api.core.controller.json;
 
-public class SpiderJson {
+public class Spider {
     private Integer id;
     private String uuid;
     private String location;
     private String describe;
     private Boolean state;
 
-    public SpiderJson() {
+    public Spider() {
     }
 
-    public SpiderJson(Integer id, String uuid, String location, String describe, Boolean state) {
+    public Spider(Integer id, String uuid, String location, String describe, Boolean state) {
         this.id = id;
         this.uuid = uuid;
         this.location = location;

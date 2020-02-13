@@ -1,6 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.controller.json.SpiderJson;
+import com.cdgeekcamp.redas.api.core.controller.json.Spider;
 import com.cdgeekcamp.redas.api.core.service.ModifyUrlStatusService;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.*;
@@ -28,15 +28,15 @@ public class SpiderController {
     private ModifyUrlStatusService modifyUrlStatusService;
 
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse addSpider(@RequestBody SpiderJson spiderJson) {
+    public ApiResponse addSpider(@RequestBody Spider spiderJson) {
         String uuid = spiderJson.getUuid();
         String desc = spiderJson.getDescribe();
         String location = spiderJson.getLocation();
 
-        Optional<Spider> spiderByUuid = spiders.findByUuid(uuid);
+        Optional<com.cdgeekcamp.redas.db.model.Spider> spiderByUuid = spiders.findByUuid(uuid);
 
         if (spiderByUuid.isEmpty())
-            spiders.save(new Spider(uuid, location, desc, true));
+            spiders.save(new com.cdgeekcamp.redas.db.model.Spider(uuid, location, desc, true));
         else
             return new ApiResponse(ResponseCode.FAILED, "添加spider失败，spider已存在");
 
@@ -45,7 +45,7 @@ public class SpiderController {
 
     @PostMapping(value = "delete")
     public ApiResponse deleteSpider(@RequestParam("id") Integer id) {
-        Optional<Spider> spiderById = spiders.findById(id);
+        Optional<com.cdgeekcamp.redas.db.model.Spider> spiderById = spiders.findById(id);
 
         if (spiderById.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "删除spider失败，spider不存在");
@@ -55,18 +55,18 @@ public class SpiderController {
     }
 
     @PostMapping(value = "update", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse updateSpider(@RequestBody SpiderJson spiderJson) {
+    public ApiResponse updateSpider(@RequestBody Spider spiderJson) {
         Integer id = spiderJson.getId();
         String desc = spiderJson.getDescribe();
         String location = spiderJson.getLocation();
         Boolean state = spiderJson.getState();
 
-        Optional<Spider> spiderOpt = spiders.findById(id);
+        Optional<com.cdgeekcamp.redas.db.model.Spider> spiderOpt = spiders.findById(id);
 
         if (spiderOpt.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "修改spider失败，spider不存在");
 
-        Spider spider = spiderOpt.get();
+        com.cdgeekcamp.redas.db.model.Spider spider = spiderOpt.get();
         spider.setDescribe(desc);
         spider.setLocation(location);
         spider.setState(state);
@@ -76,7 +76,7 @@ public class SpiderController {
 
     @GetMapping(value = "get")
     public ApiResponse getSpider(@RequestParam("id") Integer id) {
-        Optional<Spider> spider = spiders.findById(id);
+        Optional<com.cdgeekcamp.redas.db.model.Spider> spider = spiders.findById(id);
 
         if (spider.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "获取spider失败");
@@ -89,15 +89,15 @@ public class SpiderController {
         Integer pageNum = new Pagination().Page(page);
 
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
-        Page<Spider> spider = spiders.findAll(pageable);
+        Page<com.cdgeekcamp.redas.db.model.Spider> spider = spiders.findAll(pageable);
 
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         map.put("totalPage", spider.getTotalPages());
 
         map.put("totalElements", spider.getTotalElements());
 
-        ArrayList<Spider> spiderlist = new ArrayList<>();
-        for (Spider item : spider) {
+        ArrayList<com.cdgeekcamp.redas.db.model.Spider> spiderlist = new ArrayList<>();
+        for (com.cdgeekcamp.redas.db.model.Spider item : spider) {
             spiderlist.add(item);
         }
         map.put("spiderList", spiderlist);

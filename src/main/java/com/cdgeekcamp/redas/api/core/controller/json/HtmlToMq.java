@@ -1,15 +1,15 @@
 package com.cdgeekcamp.redas.api.core.controller.json;
 
-public class HtmlToMqJson {
+public class HtmlToMq {
     private String url;
     private String platform;
     private String htmlString;
     private String spiderUuid;
 
-    public HtmlToMqJson() {
+    public HtmlToMq() {
     }
 
-    public HtmlToMqJson(String url, String platform, String htmlString, String spiderUuid) {
+    public HtmlToMq(String url, String platform, String htmlString, String spiderUuid) {
         this.url = url;
         this.platform = platform;
         this.htmlString = htmlString;

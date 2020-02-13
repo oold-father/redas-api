@@ -1,15 +1,15 @@
 package com.cdgeekcamp.redas.api.core.controller.json;
 
-public class PositionDetailHtmlJson {
+public class PositionDetailHtml {
     private String url;
     private String platform;
     private String htmlString;
     private String spiderUuid;
 
-    public PositionDetailHtmlJson() {
+    public PositionDetailHtml() {
     }
 
-    public PositionDetailHtmlJson(String url, String platform, String htmlString, String spiderUuid) {
+    public PositionDetailHtml(String url, String platform, String htmlString, String spiderUuid) {
         this.url = url;
         this.platform = platform;
         this.htmlString = htmlString;

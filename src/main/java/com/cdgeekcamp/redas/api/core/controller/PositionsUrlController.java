@@ -1,6 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.controller.json.PositionUrlJson;
+import com.cdgeekcamp.redas.api.core.controller.json.PositionUrl;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.PositionsUrl;
 import com.cdgeekcamp.redas.db.model.PositionsUrlRepository;
@@ -29,7 +29,7 @@ public class PositionsUrlController {
     private PositionsUrlRepository PositionsUrls;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse addPositionsUrl(@RequestBody PositionUrlJson positionUrlJsonClass) {
+    public ApiResponse addPositionsUrl(@RequestBody PositionUrl positionUrlJsonClass) {
         String url = positionUrlJsonClass.getUrl();
         Integer maxSize = positionUrlJsonClass.getMaxSize();
         Optional<PositionsUrl> result = PositionsUrls.findByUrl(url);
@@ -55,7 +55,7 @@ public class PositionsUrlController {
         resultUrl.setState(1);
         PositionsUrls.save(resultUrl);
 
-        PositionUrlJson response = new PositionUrlJson(result.iterator().next().getUrl(),result.iterator().next().getmaxSize());
+        PositionUrl response = new PositionUrl(result.iterator().next().getUrl(),result.iterator().next().getmaxSize());
         return new ApiResponseX<>(ResponseCode.SUCCESS, "获取Url成功",response);
     }
 

@@ -1,15 +1,15 @@
 package com.cdgeekcamp.redas.api.core.controller.json;
 
-public class UserJson {
+public class User {
     private Integer id;
     private String name;
     private String pwd;
     private String phone;
 
-    public UserJson() {
+    public User() {
     }
 
-    public UserJson(Integer id, String name, String pwd, String phone) {
+    public User(Integer id, String name, String pwd, String phone) {
         this.id = id;
         this.name = name;
         this.pwd = pwd;

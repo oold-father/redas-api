@@ -1,7 +1,6 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
-import com.cdgeekcamp.redas.api.core.controller.json.UserJson;
-import com.cdgeekcamp.redas.db.model.User;
+import com.cdgeekcamp.redas.api.core.controller.json.User;
 import com.cdgeekcamp.redas.db.model.UserRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
@@ -20,12 +19,12 @@ public class UserController {
     private UserRepository users;
 
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse addUser(@RequestBody UserJson userJson) {
+    public ApiResponse addUser(@RequestBody User userJson) {
         String name = userJson.getName();
         String pwd = userJson.getPwd();
         String phone = userJson.getPhone();
 
-        Optional<User> userOpt = users.findByName(name);
+        Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findByName(name);
 
         if (userOpt.isPresent())
             return new ApiResponse(ResponseCode.FAILED, "用户名已存在");
@@ -35,30 +34,30 @@ public class UserController {
         if (userOpt.isPresent())
             return new ApiResponse(ResponseCode.FAILED, "电话号码已被使用");
 
-        users.save(new User(name, pwd, phone));
+        users.save(new com.cdgeekcamp.redas.db.model.User(name, pwd, phone));
         return new ApiResponse(ResponseCode.SUCCESS, "添加成功");
     }
 
     @PostMapping(value = "delete")
     public ApiResponse deleteUser(@RequestParam("id") Integer id) {
-        Optional<User> userOpt = users.findById(id);
+        Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findById(id);
         userOpt.ifPresent(user -> users.delete(user));
 
         return new ApiResponse(ResponseCode.SUCCESS, "删除成功");
     }
 
     @PostMapping(value = "update", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ApiResponse updateUser(@RequestBody UserJson userJson) {
+    public ApiResponse updateUser(@RequestBody User userJson) {
         int userId = userJson.getId();
         String pwd = userJson.getPwd();
         String phone = userJson.getPhone();
 
-        Optional<User> userOpt = users.findById(userId);
+        Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findById(userId);
 
         if (userOpt.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "修改失败，用户id不存在");
 
-        User user = userOpt.get();
+        com.cdgeekcamp.redas.db.model.User user = userOpt.get();
         user.setPwd(pwd);
         user.setPhone(phone);
         users.save(user);
@@ -67,7 +66,7 @@ public class UserController {
 
     @GetMapping(value = "get")
     public ApiResponse getUser(@RequestParam("id") int id) {
-        Optional<User> userOpt = users.findById(id);
+        Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findById(id);
 
         if (userOpt.isEmpty())
             return new ApiResponse(ResponseCode.FAILED, "查询失败，用户id不存在");
@@ -77,10 +76,10 @@ public class UserController {
 
     @GetMapping(value = "list")
     public ApiResponse getUserList() {
-        ApiResponseList<User> apiResponseList =
+        ApiResponseList<com.cdgeekcamp.redas.db.model.User> apiResponseList =
                 new ApiResponseList<>(ResponseCode.SUCCESS, "查询成功");
 
-        for (User item : users.findAll())
+        for (com.cdgeekcamp.redas.db.model.User item : users.findAll())
             apiResponseList.addValue(item);
 
         return apiResponseList;
