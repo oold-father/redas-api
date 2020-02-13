@@ -1,10 +1,11 @@
 package com.cdgeekcamp.redas.api.core.config;
 
+import com.cdgeekcamp.redas.lib.core.mqConfig.RedasConfigBase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EsConfig {
+public class EsConfig extends RedasConfigBase {
         @Value("${redas.elasticsearch.position.host}")
         private String host;
 
