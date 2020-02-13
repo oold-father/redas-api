@@ -160,7 +160,7 @@ public class EsController {
         byte[] hash = digest.digest(recrPage.getSrcUrl().getBytes(StandardCharsets.UTF_8));
         String id = RedasString.bytesToHex(hash);
 
-        String jsonString = new JsonObject<RecrPage>().toJson(recrPage);
+        String jsonString = new JsonObject().toJson(recrPage);
 
         IndexRequest request = new IndexRequest(esConfig.getIndex())
                 .id(id)
