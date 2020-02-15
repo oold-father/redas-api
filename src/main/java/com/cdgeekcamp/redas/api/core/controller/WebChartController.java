@@ -35,6 +35,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 统计图
+ */
 @RestController
 @RequestMapping(value = "/webChart")
 @ResponseBody
