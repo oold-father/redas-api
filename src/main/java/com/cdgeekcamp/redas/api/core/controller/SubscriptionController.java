@@ -2,6 +2,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 
 import com.cdgeekcamp.redas.api.core.service.EntityManagerFactoryToResult;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
+import com.cdgeekcamp.redas.api.core.service.SqlStatement;
 import com.cdgeekcamp.redas.api.core.service.SubscriptionService;
 import com.cdgeekcamp.redas.db.model.*;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
@@ -54,18 +55,14 @@ public class SubscriptionController {
                                   @RequestParam("size") Integer size){
         Integer pagenum = new Pagination().Page(page);
         String sql = "";
+
         if("".equals(search)){
-            sql = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname,s.hash_key from subscription as s " +
-                    "left join keywords as k on k.id = s.keyword_id left join `user` as u on u.id=s.user_id GROUP by s.hash_key";
+            sql = new SqlStatement().getAllSubscriptSql();
         }else {
             Optional<User> optionalUser = userRepository.findByName(search);
+
             if (optionalUser.isPresent()){
-                User user = optionalUser.get();
-                int user_id = user.getId();
-                String sqlString = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname,s.hash_key " +
-                        "from subscription as s left join keywords as k on k.id = s.keyword_id left join `user` as u " +
-                        "on u.id=s.user_id where s.user_id=\"%d\" GROUP by s.hash_key";
-                sql = String.format(sqlString, user_id);
+                sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
             }else {
                 return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
             }
@@ -88,20 +85,16 @@ public class SubscriptionController {
                                   @RequestParam("page") Integer page,
                                   @RequestParam("size") Integer size){
         Integer pagenum = new Pagination().Page(page);
-
         Optional<UserOpen> userOpenOptional = userOpenRepository.findByOpenId(open_id);
-
         String sql = "";
+
         if (userOpenOptional.isPresent()){
+
             UserOpen userOpen = userOpenOptional.get();
             Optional<User> optionalUser = userRepository.findById(userOpen.getUserId());
+
             if (optionalUser.isPresent()){
-                User user = optionalUser.get();
-                int user_id = user.getId();
-                String sqlString = "select ANY_VALUE(u.name) as username,GROUP_CONCAT(k.key_name) as keyname,s.hash_key " +
-                        "from subscription as s left join keywords as k on k.id = s.keyword_id left join `user` as u " +
-                        "on u.id=s.user_id where s.user_id=\"%d\" GROUP by s.hash_key";
-                sql = String.format(sqlString, user_id);
+                sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
             }else {
                 return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
             }

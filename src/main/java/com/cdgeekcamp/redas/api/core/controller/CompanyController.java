@@ -37,15 +37,16 @@ public class CompanyController {
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<Company> companies = companyRepository.findAll(pageable);
 
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("totalPage", companies.getTotalPages());
-
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
         ArrayList<Company> companyList = new ArrayList<>();
+
         for (Company company : companies) {
             companyList.add(company);
         }
-        map.put("companyList", companyList);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+        resultMap.put("companyList", companyList);
+        resultMap.put("totalPage", companies.getTotalPages());
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
     }
 }

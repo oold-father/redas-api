@@ -116,18 +116,18 @@ public class SpiderController {
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<com.cdgeekcamp.redas.db.model.Spider> spider = spiders.findAll(pageable);
 
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("totalPage", spider.getTotalPages());
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
+        ArrayList<com.cdgeekcamp.redas.db.model.Spider> spiderList = new ArrayList<>();
 
-        map.put("totalElements", spider.getTotalElements());
-
-        ArrayList<com.cdgeekcamp.redas.db.model.Spider> spiderlist = new ArrayList<>();
         for (com.cdgeekcamp.redas.db.model.Spider item : spider) {
-            spiderlist.add(item);
+            spiderList.add(item);
         }
-        map.put("spiderList", spiderlist);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+        resultMap.put("spiderList", spiderList);
+        resultMap.put("totalPage", spider.getTotalPages());
+        resultMap.put("totalElements", spider.getTotalElements());
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
 
     }
 

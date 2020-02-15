@@ -37,15 +37,16 @@ public class PositionController {
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<Position> positions = positionRepository.findAll(pageable);
 
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("totalPage", positions.getTotalPages());
-
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
         ArrayList<Position> positionList = new ArrayList<>();
+
         for (Position position : positions) {
             positionList.add(position);
         }
-        map.put("positionList", positionList);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+        resultMap.put("positionList", positionList);
+        resultMap.put("totalPage", positions.getTotalPages());
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
     }
 }
