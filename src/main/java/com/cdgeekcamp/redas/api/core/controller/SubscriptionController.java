@@ -174,28 +174,12 @@ public class SubscriptionController {
     @GetMapping(value = "/deleteSub")
     public ApiResponse deleteSub(@RequestParam("open_id") String open_id,
                                  @RequestParam("hash_key") String hash_key) {
-        Optional<UserOpen> userOpenOptional = userOpenRepository.findByOpenId(open_id);
         try {
-            if (userOpenOptional.isPresent()) {
-
-                UserOpen userOpen = userOpenOptional.get();
-                Optional<User> userOptional = userRepository.findById(userOpen.getUserId());
-                List<Subscription> subscriptions = subscriptionRepository.findByHashKey(hash_key);
-
-                if (userOptional.isPresent()) {
-                    User user = userOptional.get();
-                    for (Subscription subscription : subscriptions) {
-                        if (user.getId().equals(subscription.getUserId())) {
-                            subscriptionRepository.deleteById(subscription.getId());
-                        }
-                    }
-                }
-            } else {
-                return new ApiResponse(ResponseCode.FAILED, "删除失败");
-            }
-            return new ApiResponse(ResponseCode.SUCCESS, "删除成功");
+            subscriptionService.deleteSub(open_id, hash_key);
         } catch (Exception e) {
             return new ApiResponse(ResponseCode.FAILED, "删除失败");
         }
+
+        return new ApiResponse(ResponseCode.SUCCESS, "删除成功");
     }
 }
