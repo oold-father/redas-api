@@ -30,6 +30,11 @@ public class MqController {
     @Autowired
     private RecrPageProducer recrPageProducer;
 
+    /**
+     * 发送职位列表页面到消息队列
+     * @param htmlToMq 需要发送到消息队列的html相关数据
+     * @return ApiResponse
+     */
     @PostMapping(value = "/addPositionsUrlHtml", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddPositionsUrlHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject htmlJson = new JsonObject();
@@ -37,11 +42,21 @@ public class MqController {
         return positionsUrlHtmlProducer.producerHandle(data);
     }
 
+    /**
+     * 发送职位url到消息队列
+     * @param urlToMq 需要发送到消息队列的url
+     * @return ApiResponse
+     */
     @PostMapping(value = "addPositionUrl")
     public ApiResponse mqAddPositionUrl(@RequestBody UrlToMq urlToMq){
         return positionUrlProducer.producerHandle(urlToMq.getUrl());
     }
 
+    /**
+     * 发送职位详情页面到消息队列
+     * @param htmlToMq 需要发送到消息队列的职位详情html相关数据
+     * @return ApiResponse
+     */
     @PostMapping(value = "/addPositionDetailHtml", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddPositionDetailHtml(@RequestBody HtmlToMq htmlToMq) {
         JsonObject htmlJson = new JsonObject();
@@ -49,6 +64,11 @@ public class MqController {
         return positionDetailHtmlProducer.producerHandle(data);
     }
 
+    /**
+     * 发送职位信息元数据到消息队列
+     * @param recrPage 职位信息元数据
+     * @return ApiResponse
+     */
     @PostMapping(value = "/addRecrPage", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse mqAddRecrPage(@RequestBody RecrPage recrPage) {
         JsonObject htmlJson = new JsonObject();

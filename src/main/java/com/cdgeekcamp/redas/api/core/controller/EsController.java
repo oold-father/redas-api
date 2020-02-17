@@ -56,7 +56,20 @@ public class EsController {
     {
         log = LoggerFactory.getLogger(EsController.class);
     }
-
+    /**
+     * 筛选职位
+     * @param position 职位
+     *@param address 地址
+     * @param exp 经验
+     * @param edu 学历
+     * @param stage 融资阶段
+     * @param scale 公司规模
+     * @param nature 公司行业
+     * @param page 页码
+     * @param maxEle 本页数量
+     * @return ApiResponse
+     * @throws  IOException
+     */
     @GetMapping(value = "/positions")
     public ApiResponse esGetPositions(
                                       @RequestAttribute(name = "position") String position,
@@ -155,6 +168,13 @@ public class EsController {
         return result;
     }
 
+    /**
+     * 向es添加职位数据
+     * @param recrPage 职位数据
+     * @return ApiResponse
+     * @throws  NoSuchAlgorithmException
+     * @throws  IOException
+     */
     @PostMapping(value = "/positions/addDoc")
     public ApiResponse addPosition(
             @RequestBody RecrPage recrPage
@@ -185,6 +205,16 @@ public class EsController {
         return new ApiResponse(ResponseCode.SUCCESS, "添加成功");
     }
 
+    /**
+     * 分析图 学历
+     * @param headDate 开始日期
+     * @param endDate 结束日期
+     * @param city 城市
+     * @param edu 学历
+     * @param position 职位
+     * @return ApiResponse
+     * @throws  IOException
+     */
     @GetMapping(value = "/statistics/eduAndTime")
     public ApiResponse statisticsEduAndTime(
             @RequestParam(name = "headDate") String headDate,
@@ -245,7 +275,17 @@ public class EsController {
         }
         return responseList;
     }
-
+    /**
+     * 分析图 经验
+     * @param headDate 开始日期
+     * @param endDate 结束日期
+     * @param city 城市
+     * @param exp 经验
+     * @param position 职位
+     * @return ApiResponse
+     * @throws  IOException
+     * @throws  ParseException
+     */
     @GetMapping(value = "/statistics/ExpAndTime")
     public ApiResponse statisticsExpAndTime(@RequestParam(name = "headDate") String headDate,
                                             @RequestParam(name = "endDate") String endDate,

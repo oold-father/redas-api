@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -20,6 +21,11 @@ public class BackstageController {
     @Autowired
     RequireApiConfig requireApiConfig;
 
+    /**
+     * 将数据库中的职位发送到消息队列
+     * @param isAdd  是否添加，确认操作，防止误触
+     * @return ApiResponse
+     */
     @GetMapping(value = "/positionUrl/add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestParam Integer isAdd) {
         if (isAdd == 0){
