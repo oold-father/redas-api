@@ -6,6 +6,7 @@ import com.cdgeekcamp.redas.api.core.config.EsConfig;
 import com.cdgeekcamp.redas.db.model.KeyWords;
 import com.cdgeekcamp.redas.db.model.KeyWordsRepository;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseList;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseMap;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
@@ -34,6 +35,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 统计图
+ */
 @RestController
 @RequestMapping(value = "/webChart")
 @ResponseBody
@@ -50,9 +54,12 @@ public class WebChartController {
     @Autowired
     private EsService esServices;
 
-
+    /**
+     * 获取查询条件
+     * @return ApiResponse
+     */
     @GetMapping(value = "/getTerm")
-    public ApiResponseMap<String, List<String>> getTerm(){
+    public ApiResponse getTerm(){
         try{
             ArrayList<String> position = new ArrayList<>();
             ArrayList<String> edu = new ArrayList<>();
@@ -98,14 +105,24 @@ public class WebChartController {
         }
     }
 
-    // 净增长
+    /**
+     * 净增长
+     * @param position 职位
+     * @param edu 学历
+     * @param exp 经验
+     * @param city 城市
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return ApiResponse
+     * @throws IOException
+     */
     @GetMapping(value = "/jobTimeNetIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeNetIncrement(@RequestAttribute(name = "position") String position,
-                                                                    @RequestParam("edu") String edu,
-                                                                    @RequestParam("exp") String exp,
-                                                                    @RequestParam("city") String city,
-                                                                    @RequestParam("startDate") String startDate,
-                                                                    @RequestParam("endDate") String endDate) throws IOException {
+    public ApiResponse jobTimeNetIncrement(@RequestAttribute(name = "position") String position,
+                                        @RequestParam("edu") String edu,
+                                        @RequestParam("exp") String exp,
+                                        @RequestParam("city") String city,
+                                        @RequestParam("startDate") String startDate,
+                                        @RequestParam("endDate") String endDate) throws IOException {
         try{
 
             RestHighLevelClient client = esServices.getClient();
@@ -160,14 +177,24 @@ public class WebChartController {
         }
     }
 
-    // 环比增长
+    /**
+     * 环比增长
+     * @param position 职位
+     * @param edu 学历
+     * @param exp 经验
+     * @param city 城市
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return ApiResponse
+     * @throws IOException
+     */
     @GetMapping(value = "/jobTimeMoMIncrement")
-    public ApiResponseList<Map<String, Object>> jobTimeMoMIncrement(@RequestAttribute("position") String position,
-                                                                    @RequestParam("edu") String edu,
-                                                                    @RequestParam("exp") String exp,
-                                                                    @RequestParam("city") String city,
-                                                                    @RequestParam("startDate") String startDate,
-                                                                    @RequestParam("endDate") String endDate) throws IOException {
+    public ApiResponse jobTimeMoMIncrement(@RequestAttribute("position") String position,
+                                        @RequestParam("edu") String edu,
+                                        @RequestParam("exp") String exp,
+                                        @RequestParam("city") String city,
+                                        @RequestParam("startDate") String startDate,
+                                        @RequestParam("endDate") String endDate) throws IOException {
         try{
 
             RestHighLevelClient client = esServices.getClient();
@@ -235,13 +262,24 @@ public class WebChartController {
         }
     }
 
+    /**
+     * 职位薪资分布
+     * @param position 职位
+     * @param edu 学历
+     * @param exp 经验
+     * @param city 城市
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return ApiResponse
+     * @throws IOException
+     */
     @GetMapping(value = "/positionSalaryChart")
-    public ApiResponseList<Map<String, Object>> positionSalaryChart(@RequestAttribute("position") String position,
-                                                                    @RequestParam("edu") String edu,
-                                                                    @RequestParam("exp") String exp,
-                                                                    @RequestParam("city") String city,
-                                                                    @RequestParam("startDate") String startDate,
-                                                                    @RequestParam("endDate") String endDate) throws IOException {
+    public ApiResponse positionSalaryChart(@RequestAttribute("position") String position,
+                                        @RequestParam("edu") String edu,
+                                        @RequestParam("exp") String exp,
+                                        @RequestParam("city") String city,
+                                        @RequestParam("startDate") String startDate,
+                                        @RequestParam("endDate") String endDate) throws IOException {
         try{
 
             RestHighLevelClient client = esServices.getClient();

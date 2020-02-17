@@ -3,6 +3,7 @@ package com.cdgeekcamp.redas.api.core.controller;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
 import com.cdgeekcamp.redas.db.model.Position;
 import com.cdgeekcamp.redas.db.model.PositionRepository;
+import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponseX;
 import com.cdgeekcamp.redas.lib.core.api.ResponseCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +25,28 @@ public class PositionController {
     @Autowired
     private PositionRepository positionRepository;
 
+    /**
+     * 获取职位列表
+     * @param page 页码
+     * @return ApiResponse
+     */
     @GetMapping(value = "/getPositionList")
-    public ApiResponseX<LinkedHashMap<String, Object>> getPositionList(@PathParam("page") Integer page){
+    public ApiResponse getPositionList(@PathParam("page") Integer page){
         Integer pageNum = new Pagination().Page(page);
 
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<Position> positions = positionRepository.findAll(pageable);
 
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("totalPage", positions.getTotalPages());
-
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
         ArrayList<Position> positionList = new ArrayList<>();
+
         for (Position position : positions) {
             positionList.add(position);
         }
-        map.put("positionList", positionList);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+        resultMap.put("positionList", positionList);
+        resultMap.put("totalPage", positions.getTotalPages());
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
     }
 }

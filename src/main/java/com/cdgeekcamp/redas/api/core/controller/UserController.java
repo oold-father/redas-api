@@ -18,6 +18,11 @@ public class UserController {
     @Autowired
     private UserRepository users;
 
+    /**
+     * 添加用户
+     * @param userJson 用户信息
+     * @return ApiResponse
+     */
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addUser(@RequestBody User userJson) {
         String name = userJson.getName();
@@ -38,6 +43,11 @@ public class UserController {
         return new ApiResponse(ResponseCode.SUCCESS, "添加成功");
     }
 
+    /**
+     * 删除用户
+     * @param id id
+     * @return ApiResponse
+     */
     @PostMapping(value = "delete")
     public ApiResponse deleteUser(@RequestParam("id") Integer id) {
         Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findById(id);
@@ -46,6 +56,11 @@ public class UserController {
         return new ApiResponse(ResponseCode.SUCCESS, "删除成功");
     }
 
+    /**
+     * 修改用户信息
+     * @param userJson 用户信息
+     * @return ApiResponse
+     */
     @PostMapping(value = "update", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse updateUser(@RequestBody User userJson) {
         int userId = userJson.getId();
@@ -64,6 +79,11 @@ public class UserController {
         return new ApiResponse(ResponseCode.SUCCESS, "修改成功");
     }
 
+    /**
+     * 获取用户信息
+     * @param id id
+     * @return ApiResponse
+     */
     @GetMapping(value = "get")
     public ApiResponse getUser(@RequestParam("id") int id) {
         Optional<com.cdgeekcamp.redas.db.model.User> userOpt = users.findById(id);
@@ -74,6 +94,10 @@ public class UserController {
         return new ApiResponseX<>(ResponseCode.SUCCESS, "查询成功", userOpt.get());
     }
 
+    /**
+     * 用户列表
+     * @return ApiResponse
+     */
     @GetMapping(value = "list")
     public ApiResponse getUserList() {
         ApiResponseList<com.cdgeekcamp.redas.db.model.User> apiResponseList =

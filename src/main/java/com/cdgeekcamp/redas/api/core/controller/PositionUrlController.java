@@ -35,6 +35,11 @@ public class PositionUrlController {
     @Autowired
     RequireApiConfig config;
 
+    /**
+     * 添加url
+     * @param urlsToDB 职位url
+     * @return ApiResponse
+     */
     @PostMapping(value = "/addUrl", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addPositionsUrl(@RequestBody UrlsToDB urlsToDB) {
 
@@ -104,8 +109,13 @@ public class PositionUrlController {
         return responseList;
     }
 
+    /**
+     * 获取url列表
+     * @param page 页码
+     * @return ApiResponse
+     */
     @GetMapping(value = "/getUrlList")
-    public ApiResponseX<LinkedHashMap<String, Object>> getPositionUrlList(@PathParam("page") Integer page){
+    public ApiResponse getPositionUrlList(@PathParam("page") Integer page){
         Integer pageNum = new Pagination().Page(page);
 
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");

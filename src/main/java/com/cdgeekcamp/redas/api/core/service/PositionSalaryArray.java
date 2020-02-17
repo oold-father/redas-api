@@ -2,7 +2,9 @@ package com.cdgeekcamp.redas.api.core.service;
 
 import org.springframework.stereotype.Service;
 
-
+/**
+ * 职位与薪资水平
+ */
 @Service
 public class PositionSalaryArray {
     public int[][] getInterval(){

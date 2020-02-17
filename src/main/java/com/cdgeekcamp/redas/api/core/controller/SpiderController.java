@@ -27,6 +27,11 @@ public class SpiderController {
     @Autowired
     private ModifyUrlStatusService modifyUrlStatusService;
 
+    /**
+     * 添加爬虫
+     * @param spiderJson spider
+     * @return ApiResponse
+     */
     @PostMapping(value = "add", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse addSpider(@RequestBody Spider spiderJson) {
         String uuid = spiderJson.getUuid();
@@ -43,6 +48,11 @@ public class SpiderController {
         return new ApiResponse(ResponseCode.SUCCESS, "添加spider成功");
     }
 
+    /**
+     * 删除爬虫
+     * @param id id
+     * @return ApiResponse
+     */
     @PostMapping(value = "delete")
     public ApiResponse deleteSpider(@RequestParam("id") Integer id) {
         Optional<com.cdgeekcamp.redas.db.model.Spider> spiderById = spiders.findById(id);
@@ -54,6 +64,11 @@ public class SpiderController {
         return new ApiResponse(ResponseCode.SUCCESS, "删除spider成功");
     }
 
+    /**
+     * 修改爬虫
+     * @param spiderJson spider
+     * @return ApiResponse
+     */
     @PostMapping(value = "update", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ApiResponse updateSpider(@RequestBody Spider spiderJson) {
         Integer id = spiderJson.getId();
@@ -74,6 +89,11 @@ public class SpiderController {
         return new ApiResponse(ResponseCode.SUCCESS, "修改spider成功");
     }
 
+    /**
+     * 获取爬虫
+     * @param id id
+     * @return ApiResponse
+     */
     @GetMapping(value = "get")
     public ApiResponse getSpider(@RequestParam("id") Integer id) {
         Optional<com.cdgeekcamp.redas.db.model.Spider> spider = spiders.findById(id);
@@ -84,6 +104,11 @@ public class SpiderController {
         return new ApiResponseX<>(ResponseCode.SUCCESS, "获取spider成功", spider.get());
     }
 
+    /**
+     * 获取爬虫列表
+     * @param page 页码
+     * @return
+     */
     @GetMapping(value = "list")
     public ApiResponse getSpiderList(@PathParam("page") Integer page) {
         Integer pageNum = new Pagination().Page(page);
@@ -91,21 +116,25 @@ public class SpiderController {
         Pageable pageable = PageRequest.of(pageNum, 20, Sort.Direction.ASC, "Id");
         Page<com.cdgeekcamp.redas.db.model.Spider> spider = spiders.findAll(pageable);
 
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        map.put("totalPage", spider.getTotalPages());
+        LinkedHashMap<String, Object> resultMap = new LinkedHashMap<>();
+        ArrayList<com.cdgeekcamp.redas.db.model.Spider> spiderList = new ArrayList<>();
 
-        map.put("totalElements", spider.getTotalElements());
-
-        ArrayList<com.cdgeekcamp.redas.db.model.Spider> spiderlist = new ArrayList<>();
         for (com.cdgeekcamp.redas.db.model.Spider item : spider) {
-            spiderlist.add(item);
+            spiderList.add(item);
         }
-        map.put("spiderList", spiderlist);
 
-        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", map);
+        resultMap.put("spiderList", spiderList);
+        resultMap.put("totalPage", spider.getTotalPages());
+        resultMap.put("totalElements", spider.getTotalElements());
+
+        return new ApiResponseX<>(ResponseCode.SUCCESS, "成功", resultMap);
 
     }
 
+    /**
+     * 修改爬虫状态
+     * @param spider spider
+     */
     @GetMapping(value = "/modifyUrlStatus")
     public void modifyUrlStatus(@RequestParam("spider") String spider){
         if (spider.equals("list")){
