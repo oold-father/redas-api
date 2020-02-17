@@ -58,15 +58,18 @@ public class SubscriptionController {
         String sql = "";
 
         if ("".equals(search)) {
+            // 查询条件不存在，查询所有订阅
             sql = new SqlStatement().getAllSubscriptSql();
         } else {
+            // 查询条件存在，查询一个用户的订阅
             Optional<User> optionalUser = userRepository.findByName(search);
 
-            if (optionalUser.isPresent()) {
-                sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
-            } else {
+            // 判断用户存在
+            if (optionalUser.isEmpty()) {
                 return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
             }
+
+            sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
         }
 
         return subscriptionService.getAllOrUserSubList(sql, pagenum, size, page);
@@ -90,19 +93,20 @@ public class SubscriptionController {
         Optional<UserOpen> userOpenOptional = userOpenRepository.findByOpenId(open_id);
         String sql = "";
 
-        if (userOpenOptional.isPresent()) {
-
-            UserOpen userOpen = userOpenOptional.get();
-            Optional<User> optionalUser = userRepository.findById(userOpen.getUserId());
-
-            if (optionalUser.isPresent()) {
-                sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
-            } else {
-                return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
-            }
-        } else {
+        // 判断useropen表中的user是否存在
+        if (userOpenOptional.isEmpty()) {
             return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
         }
+
+        UserOpen userOpen = userOpenOptional.get();
+        Optional<User> optionalUser = userRepository.findById(userOpen.getUserId());
+
+        // 判断用户是否存在
+        if (optionalUser.isEmpty()) {
+            return new ApiResponseX<>(ResponseCode.FAILED, "用户不存在", new HashMap<>());
+        }
+
+        sql = new SqlStatement().getUserSubscriptSql(optionalUser.get());
 
         return subscriptionService.getAllOrUserSubList(sql, pagenum, size, page);
     }
