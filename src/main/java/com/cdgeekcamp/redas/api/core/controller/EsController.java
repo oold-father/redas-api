@@ -32,7 +32,8 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -50,6 +51,12 @@ public class EsController {
     @Autowired
     private EsService esService;
 
+    private Logger log;
+
+    {
+        log = LoggerFactory.getLogger(EsController.class);
+    }
+
     @GetMapping(value = "/positions")
     public ApiResponse esGetPositions(
                                       @RequestAttribute(name = "position") String position,
@@ -63,9 +70,7 @@ public class EsController {
                                       @RequestParam(name = "maxEle", defaultValue = "20", required = false) Integer maxEle
     ) throws IOException {
 
-        RestHighLevelClient client = esService.getClient();
-
-        Integer pageNum = new Pagination().Page(page);
+        // 需要相同操作的参数放入Map, 便于遍历
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("address", address);
         paramMap.put("exp", exp);
@@ -73,14 +78,11 @@ public class EsController {
         paramMap.put("stage", stage);
         paramMap.put("scale", scale);
         paramMap.put("companyNature", nature);
-
-
-        SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
-
+        // 构造dsl的数据筛选条件
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         for (Map.Entry<String, String> param : paramMap.entrySet()) {
-            if (!param.getValue().equals("不限")) {
+            boolean paramIsLimited = !param.getValue().equals("不限");
+            if (paramIsLimited) {
                 boolQueryBuilder.must(QueryBuilders.matchQuery(param.getKey(), param.getValue())
                         .operator(Operator.fromString("AND")));
             }
@@ -88,19 +90,25 @@ public class EsController {
         BoolQueryBuilder positionBoolQueryBuilder = QueryBuilders.boolQuery();
 
         for (String item : position.split(",")) {
-            if (!item.equals("不限")) {
+            boolean itemIsLimited = !item.equals("不限");
+            if (itemIsLimited) {
                 positionBoolQueryBuilder.should(QueryBuilders.matchQuery("position", item)
                         .operator(Operator.fromString("AND")));
             }
         }
         boolQueryBuilder.must(positionBoolQueryBuilder);
-
+        // 构造dsl的参数条件
+        Integer pageNum = new Pagination().Page(page);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQueryBuilder)
                 .from(pageNum * maxEle)
                 .size(maxEle)
                 .timeout(new TimeValue(60, TimeUnit.SECONDS));
 
+        // 构造es客户端
+        RestHighLevelClient client = esService.getClient();
+        // 构造DSL请求
+        SearchRequest searchRequest = new SearchRequest(esConfig.getIndex());
         searchRequest.source(searchSourceBuilder);
         // 发送请求， 获取结果
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -110,14 +118,13 @@ public class EsController {
         TotalHits totalHits = hits.getTotalHits();
         // 查询到的数据总数
         long numHits = totalHits.value;
-        // 查询到的数据列表前10个
+        // 查询到的数据列表
         SearchHit[] searchHits = hits.getHits();
 
         ArrayList<Map<String, Object>> resultList = new ArrayList<>();
 
         for (SearchHit hit : searchHits) {
-            // do something with the SearchHit
-
+            // 从查询结果中筛选信息
             Map<String, Object> sourceAsMap = hit.getSourceAsMap();
             Map<String, Object> positionInfo = new HashMap<>();
             String posDesc = sourceAsMap.get("posDesc").toString();
@@ -137,7 +144,6 @@ public class EsController {
             positionInfo.put("stage", sourceAsMap.get("stage"));
             positionInfo.put("tagList", sourceAsMap.get("tagList"));
 
-
             resultList.add(positionInfo);
         }
 
@@ -153,8 +159,6 @@ public class EsController {
     public ApiResponse addPosition(
             @RequestBody RecrPage recrPage
     ) throws NoSuchAlgorithmException, IOException {
-        RestHighLevelClient client = esService.getClient();
-
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(recrPage.getSrcUrl().getBytes(StandardCharsets.UTF_8));
@@ -165,12 +169,12 @@ public class EsController {
         IndexRequest request = new IndexRequest(esConfig.getIndex())
                 .id(id)
                 .source(jsonString, XContentType.JSON);
-
+        RestHighLevelClient client = esService.getClient();
         IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
         if (indexResponse.getResult() == DocWriteResponse.Result.CREATED) {
-            System.out.println(String.format("文档不存在, 创建新的文档, 文档id:%s", id));
+            log.debug(String.format("文档不存在, 创建新的文档, 文档id:%s", id));
         } else if (indexResponse.getResult() == DocWriteResponse.Result.UPDATED) {
-            System.out.println(String.format("文档已存在, 更新文档, 文档id:%s", id));
+            log.debug(String.format("文档已存在, 更新文档, 文档id:%s", id));
         }
 
         ReplicationResponse.ShardInfo shardInfo = indexResponse.getShardInfo();
@@ -188,7 +192,7 @@ public class EsController {
             @RequestParam(name = "city") String city,
             @RequestParam(name = "edu") String edu,
             @RequestAttribute(name = "position") String position
-    ) throws IOException, ParseException {
+    ) throws IOException {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.rangeQuery("publishTime").gte(headDate).lte(endDate))
