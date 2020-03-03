@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories("com.cdgeekcamp.redas.db.model")
+//@EnableJpaRepositories("com.cdgeekcamp.redas.db.model")
 @EntityScan("com.cdgeekcamp.redas.db.model")
 @ComponentScan({
         "com.cdgeekcamp.redas.lib.core",

@@ -1,6 +1,8 @@
 package com.cdgeekcamp.redas.api.core.controller;
 
+import com.cdgeekcamp.redas.api.core.service.DataSourceConfig;
 import com.cdgeekcamp.redas.api.core.service.Pagination;
+import com.cdgeekcamp.redas.api.core.service.TargetDateSource;
 import com.cdgeekcamp.redas.db.model.Company;
 import com.cdgeekcamp.redas.db.model.CompanyRepository;
 import com.cdgeekcamp.redas.lib.core.api.ApiResponse;
@@ -31,6 +33,7 @@ public class CompanyController {
      * @return ApiResponse
      */
     @GetMapping(value = "/getCompanyList")
+    @TargetDateSource(dataSource = DataSourceConfig.READ_DATASOURCE_KEY)
     public ApiResponse getCompanyList(@PathParam("page") Integer page){
         Integer pageNum = new Pagination().Page(page);
 
